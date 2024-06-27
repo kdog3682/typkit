@@ -1,0 +1,14 @@
+[package]
+name = "stdlib"
+version = "0.1.0"
+compiler = "0.11.0"
+repository = "https://github.com/kdog3682/typst-stdlib"
+entrypoint = "src/index.typ"
+authors = [
+  "Kevin Lee <https://github.com/kdog3682>",
+]
+license = "MIT"
+description = "quick and easy useful utility helpers"
+categories = [ "library" ]
+keywords = [ "library", "helpers" ]
+exclude = [ "manual.pdf", "manual.typ" ]
