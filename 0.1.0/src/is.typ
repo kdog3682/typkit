@@ -11,4 +11,6 @@
 #let is-string(x) = { type(x) == str }
 #let is-truthy(x) = { x == true or x == 1 }
 #let is-falsy(x) = { x == false or x == 0 }
+#let is-odd(x) = { calc.odd(x) }
+#let is-even(x) = { calc.even(x) }
 

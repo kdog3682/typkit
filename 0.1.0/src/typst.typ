@@ -4,3 +4,5 @@
 #let box = box
 #let length = length
 #let measure = measure
+#let table = table
+

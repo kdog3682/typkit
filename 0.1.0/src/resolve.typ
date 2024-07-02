@@ -1,6 +1,6 @@
 #import "is.typ": *
 
-#let resolve-list(x) = {
+#let resolve-array(x) = {
     if is-array(x) {
         x
     } else if is-none(x) {
@@ -32,9 +32,10 @@
   let colors = (
     "red": red,
     "white": white,
+    "black": black,
+    "yellow": yellow,
     "blue": blue,
     "orange": orange,
-    "blue": blue,
     "green": green,
   )
   return colors.at(x)

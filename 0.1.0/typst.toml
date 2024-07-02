@@ -1,8 +1,8 @@
 [package]
-name = "stdlib"
+name = "typkit"
 version = "0.1.0"
 compiler = "0.11.0"
-repository = "https://github.com/kdog3682/typst-stdlib"
+repository = "https://github.com/kdog3682/typkit"
 entrypoint = "src/index.typ"
 authors = [
   "Kevin Lee <https://github.com/kdog3682>",
