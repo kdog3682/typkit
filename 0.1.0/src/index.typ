@@ -1,4 +1,6 @@
+#import "types.typ": *
 #import "validation.typ": *
+#import "assertion.typ": *
 #import "resolve.typ": *
 #import "typography.typ": *
 #import "misc.typ": *
@@ -6,10 +8,14 @@
 #import "layout.typ": *
 #import "str-utils.typ": *
 #import "eval.typ": *
+
+#import "pages.typ"
 #import "strokes.typ"
+#import "sizes.typ"
+#import "alignments.typ"
 #import "lines.typ"
 #import "ink.typ"
-#import "equations.typ"
+#import "patterns.typ"
 #import "marks.typ"
 #import "typst.typ"
 
@@ -36,14 +42,4 @@
     v(-5pt)
     line(length: 100%, stroke: strokes.soft)
   }
-}
-
-#let spaced-letters(s, spacing: 3pt, ..style) = {
-  let characters = split(s).map(text.with(..style.named()))
-  return characters.join(h(spacing))
-}
-
-
-#let outlined(c) = {
-    box(c, stroke: red)
 }

@@ -1,16 +1,73 @@
 #import "resolve.typ": *
 #import "ao.typ": *
+#import "misc.typ": wrap
 #import "typography.typ": *
 #import "validation.typ": *
-#import "strokes.typ"
 
-#let centered(c) = {
-    align(c, center)
+#import "strokes.typ"
+#import "lines.typ"
+#import "typst.typ"
+
+
+#let transpose(arr, width) = {
+  array.zip(..arr.chunks(width)).join()
+}
+
+#let apply-padding(c, ..sink) = {
+    let kwargs = sink.named()
+    let left = kwargs.at("padding-left", default: none)
+    let right = kwargs.at("padding-right", default: none)
+    let x = kwargs.at("padding-x", default: none)
+    if left != none { h(resolve-pt(left)) }
+    else if x != none {
+        h(resolve-pt(x))
+    }
+    c
+    if right != none { h(resolve-pt(right)) }
+    else if x != none {
+        h(resolve-pt(x))
+    }
+}
+
+#let apply-margins(c, ..sink) = {
+    let kwargs = sink.named()
+    let left = kwargs.at("margin-left", default: none)
+    let right = kwargs.at("margin-right", default: none)
+    let bottom = kwargs.at("margin-bottom", default: none)
+    let top = kwargs.at("margin-top", default: none)
+    let x = kwargs.at("margin-x", default: none)
+    let y = kwargs.at("margin-y", default: none)
+    let base = (
+        left: left,
+        right: right,
+        x: x,
+        y: y,
+        bottom: bottom,
+        top: top,
+    )
+    // let attrs = (:)
+    // assign(attrs, base)
+    // pad(c, ..remove-none(base))
+}
+
+#let centered(c, ..sink) = {
+    let args = sink.pos()
+    let alignment  =  if args.len() == 1 {
+        horizon + center
+    } else {
+        center
+    }
+    align(c, alignment)
 }
 #let flex(..sink) = {
-    let args = sink.pos()
     let opts = sink.named()
-    stack(dir: ltr, spacing: 10pt, ..args.map((arg) => align(arg, horizon)))
+    let aligner(c) = {
+        return align(c, opts.at("align", default: horizon))
+    }
+
+    let kwargs = build-attrs((spacing: 15pt), sink)
+    let args = sink.pos().map(aligner)
+    stack(dir: ltr, ..args, ..kwargs)
 }
 
 #let tflex(..sink) = {
@@ -22,17 +79,19 @@
 
 
 #let base-flex(..args) = {
-    let pos = args.pos()
+
     let base = (
         inset: 0pt,
-        column-gutter: 20pt,
+        column-gutter: 15pt,
+        stroke: none, 
     )
-    let opts = merge-dictionary(base, args.named())
+    let pos = args.pos()
+    let opts = build-attrs(base, args)
     let spacing = opts.remove("spacing", default: none)
     if spacing != none {
         opts.insert("column-gutter", spacing)
     }
-    table(columns: pos.len(), stroke: none, ..opts, ..pos)
+    table(columns: pos.len(), ..opts, ..pos)
 }
 #let tflex(..sink) = {
     base-flex(align: horizon + center, ..sink)
@@ -93,19 +152,42 @@
 }
 
 
-#let simple-colon(a, b, spacing: 10pt) = {
-    if is-string(a) {
+#let simple-colon(a, b, spacing: 0.5em, underline: false,
+..sink) = {
+
+    let prefix = if is-string(a) {
         bold(a + ":")
     } else {
         bold(a)
     }
-    h(spacing)
-    resolve-content(b)
+
+    let c = resolve-content(b)
+    let suffix = if underline == true {
+        typst.underline(c)
+    } else {
+        c
+    }
+
+    let value = {
+        prefix
+        h(spacing)
+        suffix
+    }
+
+    text(value, ..sink)
+}
+
+#let is-bolded(el) = {
+    if is-string(el) {
+        return false
+    }
+    let children = el.fields().children
+    return children.any((x) => x.func() == strong)
 }
 
 #let colon(..sink) = {
-    let opts=sink.named()
     let pos=sink.pos()
+    let opts=sink.named()
     if pos.len() == 2 {
         return simple-colon(..pos, ..opts)
     }
@@ -117,10 +199,18 @@
     let join = joins.at(opts.at("join", default: "comma"))
     let width = opts.at("width", default: none)
     let align = opts.at("align", default: top)
+    
+    let base-table-attrs = (
+        column-gutter: 15pt, row-gutter: 15pt, inset: 0pt
+    )
+    let table-attrs = build-attrs(base-table-attrs, sink)
 
     let callback((i, el)) = {
         if is-even(i) {
-            if is-string(el) {
+            if is-bolded(el) {
+                el
+            }
+            else if is-string(el) {
                 bold(str(el) + ":")
             } else {
                 bold(el)
@@ -135,7 +225,7 @@
     }
 
     let args = pos.enumerate().map(callback)
-    let c = table(columns: 2, stroke: none, align: align, column-gutter: 15pt, row-gutter: 20pt, inset: 0pt, ..args)
+    let c = table(columns: 2, stroke: none, align: align, ..table-attrs, ..args)
 
     if exists(width) {
         box(c, width: width)
@@ -165,3 +255,128 @@
 #let indent(c, ind) = {
     stack(dir: ltr, h(resolve-pt(ind)), resolve-content(c), spacing: 0pt)
 }
+
+#let indent(content, indent: 15pt, above: 5pt, below: 10pt, width: 65%, spacing: 0.6em) = {
+  v(above)
+  let c = block(width: width, spacing: spacing, {
+        set text(size: 0.9em)
+        content
+  })
+  stack(dir: ltr, h(indent), c, spacing: 0pt)
+  v(below)
+}
+
+
+#let boxy(c, ..sink) = {
+    let base = (
+        stroke: 0.25pt + black,
+        inset: (
+            x: 5pt,
+            y: 5pt,
+        ),
+        radius: 3pt,
+        baseline: 25%,
+    )
+    let attrs = build-attrs(base, sink, key: "box", aliases: true)
+    let kwargs = sink.named()
+    let outer-label = kwargs.at("outer-label", default: none)
+    let p = box(..attrs, resolve-math-content(c))
+    if outer-label != none {
+        p = box({
+             centered(resolve-math-content(outer-label))
+             v(-5pt)
+             p
+        }, stroke: none)
+    }
+    apply-padding(p, ..sink)
+}
+
+#let stack-boxy(a, b, inner: (:), outer: (:), spacing: 10pt) = {
+    let inner-attrs = inner
+    let outer-attrs = outer
+    boxy(..outer-attrs, stack(align(boxy(resolve-content(a), ..inner-attrs), horizon), align(resolve-content(b), horizon), spacing: spacing, dir: ltr))
+}
+
+#let flex-table(..sink) = {
+    let opts = sink.named()
+    let rows = sink.pos()
+    
+    let base = (
+        stroke: none,
+        align: left + horizon,
+        inset: 0pt,
+        columns: rows.at(0).len(),
+        column-gutter: 15pt,
+        row-gutter: 10pt,
+    )
+    let attrs = build-attrs(base, sink, key: "table")
+    table(..attrs, ..rows.flatten())
+}
+
+
+#let x-table(..sink) = {
+    let opts = sink.named()
+    let rows = sink.pos()
+    
+    let base = (
+        inset: 10pt, 
+        align: horizon + center,
+    )
+    let attrs = build-attrs(base, sink, key: "table")
+
+    let dir = opts.at("dir", default: "V")
+    if dir == "H" {
+        let a = ()
+        let b = ()
+        for ((x, y)) in rows {
+            a.push(x)
+            b.push(y)
+        }
+        attrs.insert("columns", a.len())
+        let elements = a + b
+        table(..attrs, ..elements)
+    } else {
+        attrs.insert("columns", rows.at(0).len())
+        table(..attrs, ..rows.flatten())
+    }
+}
+
+
+#let title(c, line: "soft") = {
+    centered(h1(resolve-content(c)))
+    v(-15pt)
+    dictionary(lines).at(line)
+    v(10pt)
+}
+
+
+#let footer(c) = {
+    place(box({
+        lines.soft
+        resolve-content(c)
+    }), bottom + center)
+}
+
+// flex2 is the next version of base-flex
+// it might be the next version of all the flexes
+// it is the most explicit
+// go with this
+
+#let flex2(..sink) = {
+    let args = sink.pos()
+    let items = ()
+    let align = ()
+    let columns = ()
+    for arg in args {
+        items.push(arg.content)
+        align.push(arg.at("align", default: auto))
+        columns.push(arg.at("width", default: auto))
+    }
+    let items = args.map((x) => x.content)
+    let base = (
+        stroke: none
+    )
+    let kwargs = build-attrs(base, sink, key: "table")
+    table(..items, align: align, columns: columns, ..kwargs)
+}
+// #simple-colon("abc", "def", size: 50pt,  underline: true)

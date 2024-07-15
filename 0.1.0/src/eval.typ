@@ -14,7 +14,7 @@
         x
     }
 
-    return eval(s, mode: "markup", scope: scope)
+    return eval(str(s), mode: "markup", scope: scope)
 }
 #let markup-factory(..modules) = {
     let scope = create-scope(..modules)
