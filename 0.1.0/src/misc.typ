@@ -349,3 +349,28 @@
     }
 }
 
+
+
+#let calculate-frame(numbers, k) = {
+  let callback(n) = {
+    let rounded = calc.floor(n / k) * k
+    let value = if rounded == 0 { k } else { rounded }
+    let delta = n - value
+    return (
+        value: value,
+        delta: delta,
+    )
+  }
+
+  let (a, b) = numbers.map(callback)
+  return (
+      dx: a.delta,
+      dy: b.delta,
+      width: a.value,
+      height: b.value
+  )
+  // calculate-frame((686.5, 174), 30) // 660, 150
+  // we get the closest smallest possible integer that is a multiple of k
+  // use this for sizing the canvas diagram
+}
+

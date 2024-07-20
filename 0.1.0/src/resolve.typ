@@ -96,3 +96,15 @@
     return if is-string(x) { dictionary(alignments).at(x) } else {x }
 }
 
+
+#let resolve-float(x) = {
+    return if type(x) == length {
+        let r = "\d+(?:\.\d+)?"
+        let m = repr(x).match(regex(r))
+        float(m)
+    } else {
+        x
+    }
+
+}
+

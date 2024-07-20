@@ -1,21 +1,11 @@
+#import "headers/index.typ" as headers
+#import "footers/index.typ" as footers
 
-#import "typography.typ": sm-text
-#import "layout.typ": centered
-
-#let standard-footer(page) = {
-    counter(page).display(
-        number => {
-            let num = sm-text(number)
-            let mark = [— #num —]
-            centered(mark)
-        },
-    )
-}
 
 #let dialogue = (
     paper: "us-letter",
     margin: (top: 1in, left: 1in, right: 1in, bottom: 0.85in),
-    footer: standard-footer,
+    footer: footers.standard,
 )
 
 #let standard = (
@@ -36,4 +26,16 @@
         right: 0in,
         bottom: 0in,
     ),
+)
+
+
+#let workbook = (
+    paper: "us-letter",
+    margin: (
+        top: 1in,
+        left: 1in,
+        right: 1in,
+        bottom: 1in,
+    ),
+    footer: footers.standard,
 )
