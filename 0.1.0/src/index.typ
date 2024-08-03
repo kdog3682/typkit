@@ -1,3 +1,4 @@
+// #import "pages.typ"
 #import "types.typ": *
 #import "validation.typ": *
 #import "assertion.typ": *
@@ -9,7 +10,6 @@
 #import "str-utils.typ": *
 #import "eval.typ": *
 
-#import "pages.typ"
 #import "strokes.typ"
 #import "sizes.typ"
 #import "alignments.typ"
