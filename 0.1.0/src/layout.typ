@@ -10,6 +10,7 @@
 
 
 #let transpose(arr, width) = {
+  // a helper function to swap the dimensions of a table
   array.zip(..arr.chunks(width)).join()
 }
 
@@ -380,3 +381,6 @@
     table(..items, align: align, columns: columns, ..kwargs)
 }
 // #simple-colon("abc", "def", size: 50pt,  underline: true)
+
+
+

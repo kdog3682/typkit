@@ -153,6 +153,3 @@
 #let stringify(s) = {
     return json.encode(s, pretty: false)
 }
-
-
-// #panic(test("abc", "a"))

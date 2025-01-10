@@ -1,0 +1,106 @@
+references:
+    - name: sam
+
+skills:
+    - key: go-getter
+      desc: i get things bruh
+
+personal_information:
+  name: Kevin Lu Lee
+  phone: (425)-381-0608
+  email: kevinlulee1@gmail.com
+  address: 1565 65th St, Brooklyn, NY
+
+work_experience:
+  - organization: Brooklyn Learning
+    role: Math Teacher
+    location: Brooklyn, NY
+    duration:
+      from: June 2021
+      to: August 2022
+    active: false
+    include: true
+    description: Teach math to elementary students.
+  - organization: EMC Learning Center
+    role: SAT English Teacher
+    location: Brooklyn, NY
+    duration:
+      from: February 2018
+      to: June 2019
+    active: false
+    include: true
+    description: Teach test prep for SHSAT, PSAT, SAT English.
+  - organization: Brilliant.org
+    role: Math Writer
+    location: Online
+    duration:
+      from: June 2016
+      to: October 2016
+    active: false
+    include: true
+    description: Write math problems for Brilliant.org.
+  - organization: The Smith School
+    role: Math Teacher
+    location: Manhattan, NY
+    duration:
+      from: February 2015
+      to: February 2016
+    active: false
+    include: true
+    description: |
+      Teach algebra, geometry, pre-calculus, calculus.
+      Various school-related responsibilities.
+  - organization: Ivy Prep
+    role: Science and Test Prep Tutor
+    location: Manhattan, NY
+    duration:
+      from: August 2013
+      to: February 2015
+    active: false
+    include: true
+    description: Tutor science and test prep.
+  - organization: Topway Learning Center
+    role: SAT Math Teacher
+    location: Queens, NY
+    duration:
+      from: June 2014
+      to: June 2015
+    active: false
+    include: true
+    description: |
+      Teach SHSAT Math.
+      Teach SAT Math.
+  - organization: UW Chemistry Department
+    role: Chemistry Tutor
+    location: Seattle, WA
+    duration:
+      from: September 2010
+      to: June 2012
+    active: false
+    include: true
+    description: Tutor chemistry.
+  - organization: Private Tutor
+    role: Private Tutor
+    location: Various
+    duration:
+      from: September 2010
+      to: 2018
+    active: false
+    include: true
+    description: Tutor SAT, ACT, Math, Chemistry, Physics, English.
+
+education:
+  - institution: University of Washington
+    degree: B.S. Biochemistry
+    location: Seattle, WA
+    duration:
+      from: 2008
+      to: 2012
+    include: true
+  - institution: Edmonds-Woodway High School
+    location: Edmonds, WA
+    duration:
+      from: 2004
+      to: 2008
+    include: true
+
