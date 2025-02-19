@@ -31,3 +31,10 @@
     }
     return range(a, b).map((x) => x)
 }
+
+#let markup(s, scope: (:)) = {
+    if isContent(s) {
+        return s
+    }
+    return eval(str(s), mode: "markup", scope: scope)
+}

@@ -1,5 +1,4 @@
 #import "@local/typkit:0.2.0": *
-#import "@local/typkit:0.2.0": *
 
 #let template(
     doc, title: none,
