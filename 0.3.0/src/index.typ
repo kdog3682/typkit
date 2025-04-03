@@ -67,12 +67,12 @@
     return callback(value)
 }
 
-#set page(height: 50pt)
-#let callback(page-num) = {
+#let foo() = {
+set page(height: 50pt)
+let callback(page-num) = {
     let a = div([Hammy Math Class], rect(), spacing: 10pt)
     div(a, page-num, spacing: 1fr, width: 50%)
 }
-#let foo() = {
     
     create-footer(callback: callback)
     pagebreak()
@@ -82,4 +82,4 @@
     set page(margin: 1in) // this creates a new page.
     create-footer()
 }
-#foo()
+// #foo()

@@ -369,8 +369,6 @@
   bg: "rgb(128, 128, 128)",
 )
 
-// #panic(div(12, class: myStyles))
-
 #let clsx(a, ..sink) = {
     let args = sink.pos()
     let b = if args.len() == 1 {args.at(0)} else {none}
