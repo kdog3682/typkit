@@ -1,0 +1,10 @@
+[package]
+name = "typkit"
+version = "0.3.0"
+compiler = "0.12.0"
+repository = "https://github.com/kdog3682/typkit"
+entrypoint = "src/index.typ"
+authors = [
+  "Kevin Lee <https://github.com/kdog3682>",
+]
+license = "MIT"
