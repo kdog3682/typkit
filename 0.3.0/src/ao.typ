@@ -27,3 +27,13 @@
   return a
 }
 
+#let mapfilter(store, callback) = {
+    let out = ()
+    for item in store {
+        let s = callback(item)
+        if s != none {
+            out.push(s)
+        }
+    }
+    return out
+}
