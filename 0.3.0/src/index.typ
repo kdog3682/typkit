@@ -1,4 +1,4 @@
-#import "div.typ": div, clsx, nd
+#import "div.typ": div, clsx, nd, shape
 #import "ao.typ": *
 #import "base.typ": *
 #import "layout.typ": *

@@ -1,14 +1,18 @@
+#import "ao.typ": merge-attrs, filter-none, to-array
 #let flex(
   spacing: 5pt, dir: ltr,
   ..sink,
 ) = {
   let horizontal = dir == ltr
-  let items = if sink.pos().len() == 1 {
-        sink.pos().first()
+  let base = if sink.pos().len() == 1 {
+        to-array(sink.pos().first())
   } else {
 sink.pos()
   }
-  assert(items.len() > 1, message: "provided items must have len > 1")
+  let items = filter-none(base)
+  if items.len() <= 1 {
+      return items.join()
+  }
 
   let (align, columns) = if horizontal == true {
     (horizon, items.len())

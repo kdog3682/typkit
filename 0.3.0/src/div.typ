@@ -1,5 +1,6 @@
 
-#import "ao.typ": merge-attrs
+#import "base.typ": arrow
+#import "ao.typ": merge-attrs, filter-none
 #import "layout.typ": flex
 #import "base.typ": tern, exists, to-content, mirror
 #import "./strokes.typ"
@@ -23,15 +24,6 @@
   type(x) == content and x.func() == math.equation
 }
 // Helper function to filter out none values
-#let filter-none(dict) = {
-  let result = (:)
-  for (key, value) in dict.pairs() {
-    if value != none {
-      result.insert(key, value)
-    }
-  }
-  return result
-}
 
 // Style lookup dictionaries
 #let underline_styles = (
@@ -175,7 +167,7 @@
 #let placer(place: "center", delta: 2pt, dx: none, dy: none, body) = {
   // Define the placement mappings
   if type(place) == alignment {
-      return _place(body, place, dx: dx, dy: dy)
+    return _place(body, place, dx: dx, dy: dy)
   }
   let placements = (
     "nw": (align: top + left, dx: 1, dy: 1),
@@ -473,4 +465,29 @@
   let d = builder(denominator)
   let expr = $#n/#d$
   return div(expr, ..sink)
+}
+
+// 2025-04-12 aicmp: incorporate as well top and bottom in the same pattern as left and right
+#let shape(body, left: none, right: none, spacing: 10pt, arrow-length: 10pt) = {
+  let horo = ()
+  if left != none and right != none {
+    horo.push(left)
+    horo.push(arrow(arrow-length, angle: 180deg))
+    horo.push(body)
+    horo.push(arrow(arrow-length, angle: 0deg))
+    horo.push(right)
+  } else if right != none {
+    horo.push(body)
+    horo.push(arrow(arrow-length, angle: 0deg))
+    horo.push(right)
+  } else if left != none {
+    horo.push(left)
+    horo.push(arrow(arrow-length, angle: 180deg))
+    horo.push(body)
+  } else {
+    horo.push(body)
+  }
+
+  let body = flex(..horo, spacing: spacing)
+  body
 }
