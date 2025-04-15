@@ -7,5 +7,4 @@
 #import "staging.typ": *
 #import "patterns.typ"
 #import "strokes.typ"
-
-
+#import "colors.typ"

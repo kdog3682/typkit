@@ -191,8 +191,10 @@
   // Box attributes
   width: none, height: none, bg: none,
   wh: none, stroke: none, radius: none,
+  wrapper: box,
   markup: false,
   inset: none, outset: none, clip: none,
+  caption: none,
   hidden: false,
   dx: 0pt, dy: 0pt,
   // Text attributes
@@ -206,6 +208,7 @@
   dir: ltr,
   place: none,
   delta: 0pt,
+  caption-position: "bottom",
   // Underline attributes
   underline: none,
   // Strike attributes
@@ -222,7 +225,7 @@
   } else if args.len() == 0 {
     none
   } else {
-    panic("arrays are not allowed for div. only 1 or 0 positional args is allowed")
+    // panic("arrays are not allowed for div. only 1 or 0 positional args is allowed")
     if flex == true {
       _flex(..args, spacing: spacing, dir: dir)
     } else {
@@ -373,10 +376,20 @@
       result,
       ..filtered_circle_attrs,
     )
-  } else {
+  } else if wrapper == box {
     let filtered_box_attrs = filter-none(box_attrs)
     if filtered_box_attrs.len() > 0 {
       result = box(
+        result,
+        ..filtered_box_attrs,
+      )
+    }
+  } else if wrapper == block {
+
+    let filtered_box_attrs = filter-none(box_attrs)
+    if filtered_box_attrs.len() > 0 {
+      // 2025-04-15 aicmp: turn this to block
+      result = block(
         result,
         ..filtered_box_attrs,
       )
@@ -428,7 +441,15 @@
     return hide(result)
   }
 
-  return result
+  if caption != none {
+    if caption-position == "above" {
+        flex(caption, result, dir: ttb, spacing: 10pt)
+    } else {
+        flex(result, caption, dir: ttb, spacing: 10pt)
+    }
+  } else {
+    result
+  }
 }
 
 #let myStyles = (
@@ -458,17 +479,16 @@
     if type(x) == int {
       str(x)
     } else if x == "[]" {
-      move(div(stroke: 1pt, wh: 10pt), dy: 3pt)
+      move(div(stroke: 1pt, wh: 10pt), dy: 5pt)
     }
   }
   let n = builder(numerator)
   let d = builder(denominator)
-  let expr = $#n/#d$
+  let expr = $#n/#move(d, dy: 0.5pt)$
   return div(expr, ..sink)
 }
 
-// 2025-04-12 aicmp: incorporate as well top and bottom in the same pattern as left and right
-#let shape(body, left: none, right: none, spacing: 10pt, arrow-length: 10pt) = {
+#let shape(body, left: none, right: none, top: none, bottom: none, spacing: 10pt, arrow-length: 10pt) = {
   let horo = ()
   if left != none and right != none {
     horo.push(left)
@@ -488,6 +508,26 @@
     horo.push(body)
   }
 
-  let body = flex(..horo, spacing: spacing)
-  body
+  let horo = flex(horo, dir: ltr, spacing: spacing)
+  let vertical = ()
+
+  if top != none and bottom != none {
+    vertical.push(top)
+    vertical.push(arrow(arrow-length, angle: 90deg))
+    vertical.push(horo)
+    vertical.push(arrow(arrow-length, angle: 270deg))
+    vertical.push(bottom)
+  } else if bottom != none {
+    vertical.push(horo)
+    vertical.push(arrow(arrow-length, angle: 270deg))
+    vertical.push(bottom)
+  } else if top != none {
+    vertical.push(top)
+    vertical.push(arrow(arrow-length, angle: 90deg))
+    vertical.push(horo)
+  } else {
+    vertical.push(horo)
+  }
+
+  flex(vertical, dir: ttb, spacing: spacing)
 }

@@ -18,3 +18,10 @@
 #let thin = black + 0.5pt
 #let solid = black + 0.5pt
 #let normal = black
+
+
+#let gray = (
+    thickness: 0.5pt,
+    dash: "densely-dotted",
+    paint: gray.darken(10%)
+)

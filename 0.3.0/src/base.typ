@@ -151,3 +151,20 @@
     sink.pos().join()
   }
 }
+#let resolve-fill(x) = {
+  if type(x) == color {
+      return x
+  }
+  let colors = (
+    "red": red,
+    "white": white,
+    "black": black,
+    "purple": purple,
+    "none": black,
+    "yellow": yellow,
+    "blue": blue,
+    "orange": orange,
+    "green": green,
+  )
+  return colors.at(x, default: black)
+}
