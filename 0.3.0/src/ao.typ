@@ -67,10 +67,13 @@
     return result
   }
 }
+#let maybe-dict-to-array(x) = {
+  let is-dict = type(x) == dictionary
+  return if is-dict == true { x.pairs() } else { x }
+}
 #let map(items, fn) = {
   let store = ()
-  let is-dict = type(items) == dictionary
-  let items = if is-dict == true { items.pairs() } else { items }
+  let items = maybe-dict-to-array(items)
   let as-object = type(items.first()) == dictionary
   let as-array = type(items.first()) == array
   for item in items {
@@ -85,6 +88,12 @@
   }
   return store
 }
+#let emap(items, fn, start: 0) = {
+  let items = maybe-dict-to-array(items)
+  return items.enumerate(start: start).map((i, el) => {
+        return fn(i, el)
+      })
+}
 #let repeated(iterable, n) = {
   let store = ()
   for i in range(n) {
@@ -93,4 +102,10 @@
     }
   }
   return store
+}
+
+#let assign(a, b) = {
+    for (k, v) in b.pairs() {
+        a.insert(k, v)
+    }
 }

@@ -106,6 +106,11 @@
     let value = k + rotate(
         arrow, angle * -1, 
     )
+    if angle == 270 {
+        // if dy == none {
+            dy = 227pt
+        // }
+    }
 
     if dy != none {
         move(value, dy: dy)

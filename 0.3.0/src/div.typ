@@ -191,6 +191,7 @@
   // Box attributes
   width: none, height: none, bg: none,
   wh: none, stroke: none, radius: none,
+  colors: none,
   wrapper: box,
   markup: false,
   inset: none, outset: none, clip: none,
@@ -215,11 +216,27 @@
   strike: none, scale: none,
   // Alignment (happens before box)
   align: none,
+  northwest: none,
+  southeast: none,
+  southwest: none,
+  northeast: none,
+  north: none,
+  south: none,
+  east: none,
+  west: none,
   // Rotation (happens after box)
   rotate: none, circle: none, centered: false,
 ) = {
 
   let args = sink.pos()
+  if northwest != none { args.push(div(northwest, place: "nw"))}
+  if southeast != none { args.push(div(southeast, place: "se"))}
+  if southwest != none { args.push(div(southwest, place: "sw"))}
+  if northeast != none { args.push(div(northeast, place: "ne"))}
+  if north != none { args.push(div(north, place: "n"))}
+  if south != none { args.push(div(south, place: "s"))}
+  if east != none { args.push(div(east, place: "e"))}
+  if west != none { args.push(div(west, place: "w"))}
   let content = if args.len() == 1 {
     args.first()
   } else if args.len() == 0 {
@@ -267,6 +284,11 @@
   }
   if fill != none {
     bg = fill
+  }
+
+  if colors != none {
+    bg = colors.last()
+    fg = colors.first()
   }
 
   // Apply text formatting
@@ -488,7 +510,13 @@
   return div(expr, ..sink)
 }
 
-#let shape(body, left: none, right: none, top: none, bottom: none, spacing: 10pt, arrow-length: 10pt) = {
+#let shape(body, items: none, left: none, right: none, top: none, bottom: none, spacing: 10pt, arrow-length: 10pt, arrow-spacing: 15pt) = {
+  if items != none {
+       top = items.at(0, default: none)
+       right = items.at(1, default: none)
+       bottom = items.at(2, default: none)
+       left = items.at(3, default: none)
+  }
   let horo = ()
   if left != none and right != none {
     horo.push(left)
@@ -508,12 +536,12 @@
     horo.push(body)
   }
 
-  let horo = flex(horo, dir: ltr, spacing: spacing)
+  let horo = flex(horo, dir: ltr, spacing: arrow-spacing)
   let vertical = ()
 
   if top != none and bottom != none {
     vertical.push(top)
-    vertical.push(arrow(arrow-length, angle: 90deg))
+    vertical.push(arrow(arrow-length, angle: 90deg, dy: -6pt))
     vertical.push(horo)
     vertical.push(arrow(arrow-length, angle: 270deg))
     vertical.push(bottom)
@@ -523,11 +551,12 @@
     vertical.push(bottom)
   } else if top != none {
     vertical.push(top)
+    vertical.push(v(15pt))
     vertical.push(arrow(arrow-length, angle: 90deg))
     vertical.push(horo)
   } else {
     vertical.push(horo)
   }
 
-  flex(vertical, dir: ttb, spacing: spacing)
+  flex(vertical, dir: ttb, spacing: arrow-spacing)
 }
