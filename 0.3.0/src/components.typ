@@ -1,4 +1,6 @@
 #import "base.typ": arrow
+#import "layout.typ": *
+#import "div.typ": div
 #import "ao.typ": merge-attrs
 
 /// the items are interspersed with arrows
@@ -101,4 +103,28 @@
 
   let items = questions.enumerate(start: start).map(callback)
   return items
+}
+
+#let blocks(arr, columns: none, gutter: 2pt, ..sink) = {
+  let base = (
+    wh: 15pt,
+    radius: 2pt,
+  )
+  let attrs = merge-attrs(base, sink.named())
+  let callback(fill) = {
+    return div(..attrs, fill: fill)
+  }
+  let blocks = arr.map(callback)
+  if columns == none {
+    flex(blocks)
+  } else {
+    grid(..blocks, columns: columns, gutter: gutter)
+  }
+}
+
+
+
+
+#let qr-code(id) = {
+  return div(wh: 25pt, bg: blue)
 }

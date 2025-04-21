@@ -171,21 +171,23 @@
   }
   let placements = (
     "nw": (align: top + left, dx: 1, dy: 1),
-    "n": (align: top, dx: 0pt, dy: 1),
+    "n": (align: top, dx: 0, dy: 1),
     "ne": (align: top + right, dx: -1, dy: 1),
-    "w": (align: left, dx: 1, dy: 0pt),
-    "e": (align: right, dx: -1, dy: 0pt),
+    "w": (align: left, dx: 1, dy: 0),
+    "e": (align: right, dx: -1, dy: 0),
     "sw": (align: bottom + left, dx: 1, dy: -1),
-    "s": (align: bottom, dx: 0pt, dy: -1),
+    "s": (align: bottom, dx: 0, dy: -1),
     "se": (align: bottom + right, dx: -1, dy: -1),
-    "center": (align: center, dx: 0pt, dy: 0pt),
+    "center": (align: center, dx: 0, dy: 0),
   )
 
   // Get the placement info or default to center
   let info = placements.at(place)
   _place(body, info.align, dx: info.dx * delta, dy: info.dy * delta)
 }
-
+#let contentify(x) = {
+    return to-content((x))
+}
 #let div(
   ..sink,
   // Box attributes
@@ -195,6 +197,7 @@
   wrapper: box,
   markup: false,
   inset: none, outset: none, clip: none,
+  text-stroke: none,
   caption: none,
   hidden: false,
   dx: 0pt, dy: 0pt,
@@ -219,10 +222,12 @@
   northwest: none,
   southeast: none,
   southwest: none,
+  no-none: false,
   northeast: none,
   north: none,
   south: none,
   east: none,
+  value: none,
   west: none,
   // Rotation (happens after box)
   rotate: none, circle: none, centered: false,
@@ -273,6 +278,8 @@
     } else {
       content.join()
     }
+  } else if value != none {
+    content = contentify(value)
   }
   let result = content
   if centered == true {
@@ -291,6 +298,12 @@
     fg = colors.first()
   }
 
+  if content == none {
+if width == none or height == none {
+    return
+}
+  }
+
   // Apply text formatting
   let text_attrs = (
     font: font,
@@ -300,13 +313,14 @@
     weight: weight,
     slant: slant,
     tracking: tracking,
+    stroke: text-stroke,
     baseline: baseline,
     overhang: overhang,
   )
-  if bold != none {
+  if bold ==true {
     text_attrs.weight = "bold"
   }
-  if italic != none {
+  if italic == true {
     text_attrs.style = "italic"
   }
 

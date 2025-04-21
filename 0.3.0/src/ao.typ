@@ -109,3 +109,26 @@
         a.insert(k, v)
     }
 }
+
+#let partition(items, is-split-point) = {
+  let result = ()
+  let current-group = ()
+  
+  for item in items {
+    if is-split-point(item) {
+      if current-group.len() > 0 {
+        result.push(current-group)
+        current-group = ()
+      }
+    } else {
+      current-group.push(item)
+    }
+  }
+  
+  // Add the last group if it's not empty
+  if current-group.len() > 0 {
+    result.push(current-group)
+  }
+  
+  return result
+}

@@ -50,18 +50,6 @@
     }
 }
 
-#let split(s, pattern) = {
-   let a = str(s).split(regex(pattern))
-   if a.at(0) == "" {
-       a.remove(0)
-   }
-   if a.at(-1) == "" {
-       a.remove(-1)
-   }
-   return a
-}
-
-
 
 #let arrow(
     width, fill: black,
@@ -156,7 +144,11 @@
     sink.pos().join()
   }
 }
+
+
+
 #let resolve-fill(x) = {
+  // 2025-04-19 aicmp: this should be done with a given color scheme.
   if type(x) == color {
       return x
   }
@@ -173,3 +165,11 @@
   )
   return colors.at(x, default: black)
 }
+
+#let resolve-str(s) = {
+    if is-content(s) {
+        return s.body.fields().at("text")
+    }
+    return str(s)
+}
+

@@ -18,7 +18,7 @@ ok(20, 15, 0, 10), // light-purple
 ok(13, 15, 21, 10), // blue
 )
 
-#let blocks(arr, ..sink) = {
+#let blocks(arr, columns: none, ..sink) = {
     let base = (
         wh: 15pt,
         radius: 2pt,
@@ -28,7 +28,11 @@ ok(13, 15, 21, 10), // blue
         return div(..attrs, fill: fill)
     }
     let blocks = arr.map(callback)
+    if columns == none {
     flex(blocks)
+    } else {
+        grid(..blocks, columns: columns)
+    }
 }
 
 #let roygbiv = (
@@ -40,33 +44,10 @@ ok(13, 15, 21, 10), // blue
   blue,
   purple,
 )
-// #flex(roygbiv.map(x => native(fill: x)))
-// #flex(my-colors.map(x => native(fill: x)))
 
 #let palettes = (
     fun: pallete-fun
 )
 #let silver = silver.lighten(75%)
 
-
-
-#let color-pair(a, b, toggle: none) = {
-    panic("not in use")
-    if toggle == true {
-        ()
-    }
-    let start = red
-    let d = (
-        black: white
-    )
-    panic(repr(start), start)
-    return start == white.lighten(100%)
-    print(start)
-
-      let opts = if i == 0 or i == 3 {
-        (fg: white, bg: black)
-      } else {
-        (fg: black, bg: white)
-      }
-}
 // #panic(color-pair(black))
