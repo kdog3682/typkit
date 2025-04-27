@@ -9,6 +9,7 @@
 #import "strokes.typ"
 #import "colors.typ"
 #import "string.typ"
+#import "typst.typ"
 #import "constants.typ": *
 // #import "colors.typ": color-pair
 

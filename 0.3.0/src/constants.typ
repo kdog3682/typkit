@@ -22,16 +22,15 @@
 }
 
 #let ROYGBIV9 = (
-
-ok(18, 18, 38, 9), // maroon / red
-ok(20, 15, 41, 10), // orange
-ok(20, 15, 9, 10), // light-yellow
-ok(20, 12, 52, 10), // teal (light-green)
-ok(16, 20, 87, 10), // green
-ok(20, 15, 27, 9), // bubble-gum-blue
-ok(13, 15, 21, 10), // blue
-ok(20, 15, 0, 10), // light-purple
-ok(20, 21, 1, 10), // darker purple
+    ok(18, 18, 38, 9), // maroon / red
+    ok(20, 15, 41, 10), // orange
+    ok(20, 15, 9, 10), // light-yellow
+    ok(20, 12, 52, 10), // teal (light-green)
+    ok(16, 20, 87, 10), // green
+    ok(20, 15, 27, 9), // bubble-gum-blue
+    ok(13, 15, 21, 10), // blue
+    ok(20, 15, 0, 10), // light-purple
+    ok(20, 21, 1, 10), // darker purple
 )
 
 #let OPERATORS = (
