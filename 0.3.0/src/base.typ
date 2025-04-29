@@ -177,13 +177,12 @@
     "white": white,
     "black": black,
     "purple": purple,
-    "none": black,
     "yellow": yellow,
     "blue": blue,
     "orange": orange,
     "green": green,
   )
-  return colors.at(x, default: black)
+  return colors.at(x, default: none)
 }
 
 #let resolve-str(s) = {
@@ -194,43 +193,10 @@
 }
 
 
-#let resolve-kwargs(kwargs) = {
-  // Color-related keys
-  let color_keys = (
-    "fill",
-    "stroke",
-    "paint",
-    "color",
-    "background",
-    "highlight",
-    "tint",
-  )
 
-  // Length-related keys
-  let length_keys = (
-    "width",
-    "height",
-    "thickness",
-    "inset",
-    "outset",
-    "spacing",
-    "indent",
-    "stroke-width",
-    "radius",
-    "gap",
-    "margin",
-    "padding",
-  )
-  let store = (:)
-  for (k, v) in kwargs.items() {
-    let value = if k in color-keys {
-      resolve-fill(k)
-    } else if k in length-keys {
-      resolve-point(v)
-    } else {
-      v
+#let resolve-angle(x) = {
+    if type(x) == angle {
+        return x
     }
-    store.insert(k, v)
-  }
-  return store
+    return x * 1deg
 }

@@ -31,3 +31,6 @@
 #let black = black
 #let gray = gray
 #let rotate = rotate
+#let path = path
+// #let curve = curve
+// #let tiling = tiling
