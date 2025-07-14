@@ -43,3 +43,6 @@
     "==": sym.eq,
 )
 
+#let ALPHABET = "abcdefghijklmnopqrstuvwxyz"
+#let NUMBERS = "0123456789"
+#let OPERATORS = "+-="

@@ -101,3 +101,28 @@
     let m = s.matches(regex("\d+"))
     return m.map((x) => int(x.text))
 }
+
+
+// Built-in upper() function - converts all text to uppercase
+#upper("hello world")  // "HELLO WORLD"
+
+// Custom capitalize function - capitalizes first letter only
+#let capitalize(text) = {
+  let chars = text.clusters()
+  if chars.len() > 0 {
+    upper(chars.first()) + chars.slice(1).join("")
+  } else {
+    text
+  }
+}
+
+// Title case function - capitalizes first letter of each word
+#let title-case(text) = {
+  text.split(" ").map(word => {
+    if word.len() > 0 {
+      upper(word.first()) + word.slice(1)
+    } else {
+      word
+    }
+  }).join(" ")
+}

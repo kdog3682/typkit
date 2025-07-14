@@ -16,9 +16,8 @@
   if type(x) == length {
     return x
   }
-
-  if type(x) == str {
-    return eval(x)
+  if type(x) == array {
+    return x.map(resolve-point)
   }
   return x * 1pt
 }

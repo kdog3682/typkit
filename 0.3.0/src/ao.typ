@@ -104,6 +104,16 @@
   return store
 }
 
+#let merge-dicts(..sink) = {
+    let a = (:)
+    let dicts = sink.pos()
+    for d in dicts {
+        for (k, v) in d.pairs() {
+            a.insert(k, v)
+        }
+    }
+    return a
+}
 #let assign(a, b) = {
     for (k, v) in b.pairs() {
         a.insert(k, v)

@@ -105,7 +105,11 @@
       return align(c, right)
     } else if a == none and c != none {
       // b and c are present - b in middle, c at right
-      return stack(h(1fr), b, h(1fr), c, dir: ltr)
+      // return stack(h(2fr), b, h(1fr), c, dir: ltr)
+      return {
+          place(b, center)
+          place(c, right)
+      }
     } else if b == none and c == none {
       // Only a is present - align left
       return align(a, left)
@@ -115,7 +119,14 @@
     } else if c == none and a != none and b != none {
       // a and b are present - a at left, b in middle
       return stack(a, h(1fr), b, h(1fr), dir: ltr)
-    } else {
+    } 
+else if a == none and c != none and b != none {
+      // a and b are present - a at left, b in middle
+      // plac
+      return stack(h(1fr), b, h(1fr), c, dir: ltr)
+    } 
+
+    else {
       // All three arguments are present (a, b, c)
       return stack(a, h(1fr), b, h(1fr), c, dir: ltr)
     }
@@ -169,3 +180,5 @@
     }
   }
 )
+
+#let vflex = flex.with(dir: ttb)

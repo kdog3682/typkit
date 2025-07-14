@@ -2,7 +2,9 @@
 #import "base.typ": arrow
 #import "ao.typ": merge-attrs, filter-none
 #import "layout.typ": flex
+#import "string.typ": strfmt 
 #import "base.typ": tern, exists, to-content, mirror
+#import "resolve.typ": resolve-point
 #import "./strokes.typ"
 #import "./patterns.typ"
 #let strokes = dictionary(strokes)
@@ -17,6 +19,7 @@
 #let _content = content
 #let _circle = circle
 #let _rect = rect
+#let _line = line
 #let _scale = scale
 #let _flex = flex
 
@@ -185,8 +188,14 @@
   let info = placements.at(place)
   _place(body, info.align, dx: info.dx * delta, dy: info.dy * delta)
 }
-#let contentify(x) = {
-    return to-content((x))
+#let contentify(x, template: none) = {
+  if type(x) == content {
+    return x
+  }
+  if template != none {
+      return text(strfmt(x, template))
+  }
+  return text(str(x))
 }
 #let div(
   ..sink,
@@ -197,6 +206,7 @@
   wrapper: box,
   markup: false,
   inset: none, outset: none, clip: none,
+  template: none,
   text-stroke: none,
   caption: none,
   hidden: false,
@@ -205,6 +215,7 @@
   font: none, fg: none, size: none,
   fill: none, bold: none, italic: none,
   style: none, weight: none, slant: none,
+  text-mode: none,
   tracking: none, class: none, pad-left: none,
   margin-left: none, margin-bottom: none,
   margin-top: none, margin-right: none,
@@ -215,6 +226,9 @@
   caption-position: "bottom",
   // Underline attributes
   underline: none,
+  line: none,
+  line-above: 20,
+  line-below: 30,
   // Strike attributes
   strike: none, scale: none,
   // Alignment (happens before box)
@@ -234,14 +248,30 @@
 ) = {
 
   let args = sink.pos()
-  if northwest != none { args.push(div(northwest, place: "nw"))}
-  if southeast != none { args.push(div(southeast, place: "se"))}
-  if southwest != none { args.push(div(southwest, place: "sw"))}
-  if northeast != none { args.push(div(northeast, place: "ne"))}
-  if north != none { args.push(div(north, place: "n"))}
-  if south != none { args.push(div(south, place: "s"))}
-  if east != none { args.push(div(east, place: "e"))}
-  if west != none { args.push(div(west, place: "w"))}
+  if northwest != none {
+    args.push(div(northwest, place: "nw"))
+  }
+  if southeast != none {
+    args.push(div(southeast, place: "se"))
+  }
+  if southwest != none {
+    args.push(div(southwest, place: "sw"))
+  }
+  if northeast != none {
+    args.push(div(northeast, place: "ne"))
+  }
+  if north != none {
+    args.push(div(north, place: "n"))
+  }
+  if south != none {
+    args.push(div(south, place: "s"))
+  }
+  if east != none {
+    args.push(div(east, place: "e"))
+  }
+  if west != none {
+    args.push(div(west, place: "w"))
+  }
   let content = if args.len() == 1 {
     args.first()
   } else if args.len() == 0 {
@@ -279,7 +309,7 @@
       content.join()
     }
   } else if value != none {
-    content = contentify(value)
+    content = contentify(value, template: template)
   }
   let result = content
   if centered == true {
@@ -299,12 +329,13 @@
   }
 
   if content == none {
-if width == none or height == none {
-    return
-}
+    if width == none or height == none {
+      return
+    }
   }
 
   // Apply text formatting
+  let size = resolve-point(size)
   let text_attrs = (
     font: font,
     fill: fg,
@@ -317,7 +348,7 @@ if width == none or height == none {
     baseline: baseline,
     overhang: overhang,
   )
-  if bold ==true {
+  if bold == true {
     text_attrs.weight = "bold"
   }
   if italic == true {
@@ -479,12 +510,23 @@ if width == none or height == none {
 
   if caption != none {
     if caption-position == "above" {
-        flex(caption, result, dir: ttb, spacing: 10pt)
+      flex(caption, result, dir: ttb, spacing: 10pt)
     } else {
-        flex(result, caption, dir: ttb, spacing: 10pt)
+      flex(result, caption, dir: ttb, spacing: 10pt)
     }
   } else {
     result
+  }
+  if exists(line) {
+        if line == true {
+        v(-0.85 * size)
+        _line(length: 100%)
+        v(1pt * line-below)
+        } else {
+        v(-1pt * line-above)
+        _line(length: 100%, ..line)
+        v(1pt * line-below)
+        }
   }
 }
 
@@ -524,12 +566,22 @@ if width == none or height == none {
   return div(expr, ..sink)
 }
 
-#let shape(body, items: none, left: none, right: none, top: none, bottom: none, spacing: 10pt, arrow-length: 10pt, arrow-spacing: 15pt) = {
+#let shape(
+  body,
+  items: none,
+  left: none,
+  right: none,
+  top: none,
+  bottom: none,
+  spacing: 10pt,
+  arrow-length: 10pt,
+  arrow-spacing: 15pt,
+) = {
   if items != none {
-       top = items.at(0, default: none)
-       right = items.at(1, default: none)
-       bottom = items.at(2, default: none)
-       left = items.at(3, default: none)
+    top = items.at(0, default: none)
+    right = items.at(1, default: none)
+    bottom = items.at(2, default: none)
+    left = items.at(3, default: none)
   }
   let horo = ()
   if left != none and right != none {
@@ -573,4 +625,38 @@ if width == none or height == none {
   }
 
   flex(vertical, dir: ttb, spacing: arrow-spacing)
+}
+
+
+#let looks-like-number(s) = {
+    return type(s) == float or type(s) == int or  s.match(regex("^\d+(?:\.\d+)?$")) != none
+}
+
+
+#let txt(s, font: none, fill: none, size: none, bold: false, italic: false, centered: true) = {
+
+  let attrs = (:)
+  if fill != none {
+    attrs.insert("fill", fill)
+  }
+  if size != none {
+    attrs.insert("size", size)
+  }
+
+  let p = text(s, ..attrs)
+
+  let q = if bold == true {
+    if is-math-content(s) {
+      math.bold(p)
+    } else {
+      strong(p)
+    }
+  } else {
+    p
+  }
+
+  if centered == true {
+      q = align(q, center + horizon)
+  }
+  return q
 }

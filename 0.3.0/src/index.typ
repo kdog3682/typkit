@@ -1,4 +1,5 @@
-#import "div.typ": div, clsx, nd, shape
+// #import "div.typ": div, clsx, nd, shape
+#import "div.typ": *
 #import "ao.typ": *
 #import "base.typ": *
 #import "layout.typ": *
@@ -7,10 +8,12 @@
 #import "staging.typ": *
 #import "patterns.typ"
 #import "strokes.typ"
+#import "font.typ"
 #import "colors.typ"
 #import "string.typ"
 #import "typst.typ"
 #import "constants.typ": *
+#import "resolve.typ": *
 // #import "colors.typ": color-pair
 
 #let markup(s) = {
@@ -68,3 +71,74 @@
     return func(path)
 }
 // #dataload("hi")
+
+
+
+#let placed(point, content) = {
+    let (dx, dy) = point
+    place(
+      dx: resolve-point(dx),
+      dy: resolve-point(dy),
+      content,
+    )
+}
+
+#let polygon-from-path(points, fill: none, stroke: black) = {
+    path(..points.map((pair) => pair.map(resolve-point)), fill: fill, stroke: stroke, closed: true)
+}
+
+#let mapped(func, k: 1) = {
+    return (x) => x.map(func.with(k))
+}
+
+#let centered(content) = {
+    return align(content, center)
+}
+
+
+#let o-table(objects) = {
+  let keys = objects.first().keys()
+  let store = objects.map(x => x.values()).flatten()
+  show table.cell.where(y: 0): strong
+  table(
+    columns: (60pt,) * keys.len(),
+    align: center + horizon,
+    table.header(..keys),
+    ..store
+  )
+}
+
+
+#let get-extension(file) = {
+    return file.split(".").at(-1)
+}
+#let read-data(file) = {
+    let ext = get-extension(file)
+    let ref = (
+        "yml": yaml,
+        "yaml": yaml,
+        "json": json,
+        "txt": read,
+    )
+    return ref.at(ext)(file)
+}
+#let chinese(key) = {
+    return read-data("data/chinese.yml").at(key)
+}
+
+// #panic(chinese("math practice"))
+
+
+#let preview-frame(content) = {
+  set page(margin: 5pt)
+  let r = rect(
+    width: 5in,
+    height: 50%,
+    // height: 5.25in,
+    stroke: 0.5pt + black,
+    inset: 0.5in,
+    radius: 5pt,
+    content,
+  )
+  move(scale(r, 65%), dx: -50pt, dy: -50pt)
+}
