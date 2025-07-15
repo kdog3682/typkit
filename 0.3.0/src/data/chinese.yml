@@ -1,2 +1,26 @@
-
 math practice: 数学练习
+neatness: 数学练习
+correctnesss: 数学练习
+
+# Chinese translations for strings used in tk.chi and tk.div with chinese: true
+# From wb.score-box call in display-score function
+points: "分数"
+
+# From display-student function  
+"Score Sheet": "成绩单"
+
+# From default-grading-criteria descriptions
+"Outstanding": "优秀"
+"Very Good": "良好" 
+"Good": "中等"
+"Okay": "及格"
+"Poor": "不及格"
+
+# From grading-table headers
+"Letter Grade": "等级"
+"Number Grade": "数字等级"  
+"Description": "描述"
+
+# Likely criteria keys that would use tk.chi when chinese: true
+neatness: "整洁度"
+correctness: "正确性"

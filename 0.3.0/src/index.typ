@@ -109,24 +109,10 @@
 }
 
 
-#let get-extension(file) = {
-    return file.split(".").at(-1)
-}
-#let read-data(file) = {
-    let ext = get-extension(file)
-    let ref = (
-        "yml": yaml,
-        "yaml": yaml,
-        "json": json,
-        "txt": read,
-    )
-    return ref.at(ext)(file)
-}
 #let chinese(key) = {
     return read-data("data/chinese.yml").at(key)
 }
 
-// #panic(chinese("math practice"))
 
 
 #let preview-frame(content) = {

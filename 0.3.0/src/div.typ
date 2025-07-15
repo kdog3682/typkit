@@ -1,8 +1,8 @@
 
-#import "base.typ": arrow
+#import "base.typ": arrow, read-data
 #import "ao.typ": merge-attrs, filter-none
 #import "layout.typ": flex
-#import "string.typ": strfmt 
+#import "string.typ": strfmt
 #import "base.typ": tern, exists, to-content, mirror
 #import "resolve.typ": resolve-point
 #import "./strokes.typ"
@@ -193,7 +193,7 @@
     return x
   }
   if template != none {
-      return text(strfmt(x, template))
+    return text(strfmt(x, template))
   }
   return text(str(x))
 }
@@ -205,6 +205,8 @@
   colors: none,
   wrapper: box,
   markup: false,
+  newline: none,
+  chinese: false,
   inset: none, outset: none, clip: none,
   template: none,
   text-stroke: none,
@@ -248,6 +250,17 @@
 ) = {
 
   let args = sink.pos()
+
+  if chinese == true {
+
+      font = "Noto Serif CJK SC"
+      size = 0.75em
+      let ref = read-data("data/chinese.yml")
+      let chinese = ref.at(args.first(), default: ref.at("math practice"))
+      args = (chinese,)
+      // let chinese-content = div(chinese, ..sink, size: 0.75em, )
+  }
+
   if northwest != none {
     args.push(div(northwest, place: "nw"))
   }
@@ -316,6 +329,7 @@
     align = center + horizon
   }
   if wh != none {
+    wh = resolve-point(wh)
     width = wh
     height = wh
   }
@@ -518,15 +532,23 @@
     result
   }
   if exists(line) {
-        if line == true {
-        v(-0.85 * size)
-        _line(length: 100%)
-        v(1pt * line-below)
-        } else {
-        v(-1pt * line-above)
-        _line(length: 100%, ..line)
-        v(1pt * line-below)
-        }
+    if line == true {
+      v(-0.85 * size)
+      _line(length: 100%)
+      v(1pt * line-below)
+    } else {
+      v(-1pt * line-above)
+      _line(length: 100%, ..line)
+      v(1pt * line-below)
+    }
+  }
+  if exists(newline) {
+    if newline == true {
+
+    v(-1 * size + 5pt)
+    } else {
+        v(resolve-point(newline))
+    }
   }
 }
 
@@ -629,7 +651,7 @@
 
 
 #let looks-like-number(s) = {
-    return type(s) == float or type(s) == int or  s.match(regex("^\d+(?:\.\d+)?$")) != none
+  return type(s) == float or type(s) == int or s.match(regex("^\d+(?:\.\d+)?$")) != none
 }
 
 
@@ -656,7 +678,28 @@
   }
 
   if centered == true {
-      q = align(q, center + horizon)
+    q = align(q, center + horizon)
   }
   return q
+}
+
+
+#let chi(key, singleton: false, spacing: 4pt, parentheses: true, dir: ttb, ..sink) = {
+  let ref = read-data("data/chinese.yml")
+  let chinese = ref.at(key, default: ref.at("math practice"))
+  if parentheses == true {
+      chinese = "(" + chinese + ")"
+  }
+  let chi-size = sink.named().at("size", default: 11) - 3
+  let chinese-content = div(chinese, ..sink, size: chi-size, font: "Noto Serif CJK SC")
+  if singleton == true {
+    chinese-content
+  } else {
+    stack(
+      spacing: spacing,
+      dir: dir,
+      div(key, ..sink),
+      chinese-content,
+    )
+  }
 }

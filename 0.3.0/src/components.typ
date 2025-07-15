@@ -128,3 +128,60 @@
 #let qr-code(id) = {
   return div(wh: 25pt, bg: blue)
 }
+
+
+
+
+#let bullet-grid(columns: 2, gutter: 10pt, ..sink) = {
+  let total_cells = columns * 2
+  
+  let padded_items = sink.pos()
+  while padded_items.len() < total_cells {
+    padded_items.push([])  // Add empty content for unfilled cells
+  }
+  padded_items = padded_items.slice(0, total_cells)
+  
+  // Create the grid
+  let circ = circle(radius: 1pt, fill: black)
+  grid(
+    columns: columns,
+    rows: 2,
+    gutter: gutter,
+    ..sink.named(),
+    ..padded_items.map(item => {
+      if item != [] {
+        flex(circ, item, spacing: 4pt)
+      } else {
+        []  // Empty cell
+      }
+    })
+  )
+}
+
+#let colon-table(..entries) = {
+  let pairs = entries.pos()
+
+  table(
+    columns: (auto, 7pt, auto),
+    stroke: none,
+    inset: 0pt,
+    align: left,
+    column-gutter: 0pt,
+    row-gutter: 5pt,
+    ..pairs
+      .map(pair => {
+          let (a, b) = pair
+          (strong(a), [#h(2pt):], b)
+        })
+      .flatten()
+  )
+}
+
+#let listicle(items, callback, start: 1, spacing: 10pt, template: "%s") = {
+  let runner((n, item)) = {
+    let a = div(n, template: template, wh: 22, fg: white, bg: blue, centered: true, bold: true, radius: 3pt)
+    let b = move(callback(item), dy: 7pt)
+    return grid(a, b, columns: 2, column-gutter: 10pt)
+  }
+  return items.enumerate(start: start).map(runner).join(v(spacing))
+}
