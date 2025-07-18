@@ -20,22 +20,22 @@
   if is-content(s) {
     s
   } else {
-    eval(s, mode: "markup")
+    eval(str(s), mode: "markup")
   }
 }
 
 #let stroked(..args) = {
   let dash-patterns = (
-  solid: "solid",
-  dotted: "dotted",
-  dashed: "dashed",
-  dash-dotted: "dash-dotted",
-  dd: "densely-dotted",
-  ddd: "densely-dash-dotted",
-  loosely-dotted: "loosely-dotted",
-  loosely-dashed: "loosely-dashed",
-  loosely-dash-dotted: "loosely-dash-dotted",
-    )
+    solid: "solid",
+    dotted: "dotted",
+    dashed: "dashed",
+    dash-dotted: "dash-dotted",
+    dd: "densely-dotted",
+    ddd: "densely-dash-dotted",
+    loosely-dotted: "loosely-dotted",
+    loosely-dashed: "loosely-dashed",
+    loosely-dash-dotted: "loosely-dash-dotted",
+  )
 
   let (paint, thickness, dash) = (none, none, none)
   for arg in args.pos() {
@@ -64,35 +64,35 @@
 
 
 #let dataload(name) = {
-    let is-yml = name.ends-with("yml")
-    let func = tern(is-yml, yaml, json)
-    let base = "/home/kdog3682/.kdog3682/typst-data/"
-    let path = base + name
-    return func(path)
+  let is-yml = name.ends-with("yml")
+  let func = tern(is-yml, yaml, json)
+  let base = "/home/kdog3682/.kdog3682/typst-data/"
+  let path = base + name
+  return func(path)
 }
 // #dataload("hi")
 
 
 
 #let placed(point, content) = {
-    let (dx, dy) = point
-    place(
-      dx: resolve-point(dx),
-      dy: resolve-point(dy),
-      content,
-    )
+  let (dx, dy) = point
+  place(
+    dx: resolve-point(dx),
+    dy: resolve-point(dy),
+    content,
+  )
 }
 
 #let polygon-from-path(points, fill: none, stroke: black) = {
-    path(..points.map((pair) => pair.map(resolve-point)), fill: fill, stroke: stroke, closed: true)
+  path(..points.map(pair => pair.map(resolve-point)), fill: fill, stroke: stroke, closed: true)
 }
 
 #let mapped(func, k: 1) = {
-    return (x) => x.map(func.with(k))
+  return x => x.map(func.with(k))
 }
 
 #let centered(content) = {
-    return align(content, center)
+  return align(content, center + horizon)
 }
 
 
@@ -110,7 +110,7 @@
 
 
 #let chinese(key) = {
-    return read-data("data/chinese.yml").at(key)
+  return read-data("data/chinese.yml").at(key)
 }
 
 
@@ -127,4 +127,35 @@
     content,
   )
   move(scale(r, 65%), dx: -50pt, dy: -50pt)
+}
+
+#let n2char(i) = {
+  return "ABCDEFGHIJKLMNOPQRSTUVWXYZ".at(i)
+}
+
+
+
+#let stylesheet = yaml("data/stylesheet.yml")
+#let title(s, style: "default") = {
+  div(
+    s,
+    class: stylesheet.title.at(style),
+  )
+}
+#let qnum(s, style: "default") = {
+  div(
+    s,
+    class: stylesheet.qnum.at(style),
+  )
+}
+#let repeat(el, count: 6) = {
+    let store = ()
+    for i in range(count) {
+        if type(el) == content {
+            store.push(el)
+        } else {
+            store.push(el())
+        }
+    }
+    return store
 }

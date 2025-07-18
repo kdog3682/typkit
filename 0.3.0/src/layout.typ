@@ -3,6 +3,7 @@
 #let flex(
   spacing: 5pt,
   dir: ltr,
+  centered: true,
   ..sink,
 ) = {
   let horizontal = dir == ltr
@@ -17,9 +18,19 @@
   }
 
   let (align, columns) = if horizontal == true {
+    if centered == true {
     (horizon, items.len())
+    } else {
+
+    (top, items.len())
+    }
   } else {
-    (center, 1)
+    if centered == true {
+        (center, 1)
+    } else  {
+        (left, 1)
+    }
+
   }
   grid(
     ..items, columns: columns, gutter: spacing,
@@ -181,4 +192,5 @@ else if a == none and c != none and b != none {
   }
 )
 
-#let vflex = flex.with(dir: ttb)
+#let vflex = flex.with(dir: ttb, centered: false)
+#let hflex = flex.with(dir: ltr, centered: false)

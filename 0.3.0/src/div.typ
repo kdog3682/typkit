@@ -193,7 +193,7 @@
     return x
   }
   if template != none {
-    return text(strfmt(x, template))
+    return text(strfmt(template, x))
   }
   return text(str(x))
 }
@@ -253,12 +253,12 @@
 
   if chinese == true {
 
-      font = "Noto Serif CJK SC"
-      size = 0.75em
-      let ref = read-data("data/chinese.yml")
-      let chinese = ref.at(args.first(), default: ref.at("math practice"))
-      args = (chinese,)
-      // let chinese-content = div(chinese, ..sink, size: 0.75em, )
+    font = "Noto Serif CJK SC"
+    size = 0.75em
+    let ref = read-data("data/chinese.yml")
+    let chinese = ref.at(args.first(), default: ref.at("math practice"))
+    args = (chinese,)
+    // let chinese-content = div(chinese, ..sink, size: 0.75em, )
   }
 
   if northwest != none {
@@ -321,8 +321,10 @@
     } else {
       content.join()
     }
-  } else if value != none {
-    content = contentify(value, template: template)
+  } else if content != none {
+    content = contentify(content, template: template)
+  } else {
+    // panic("HiiI")
   }
   let result = content
   if centered == true {
@@ -545,9 +547,9 @@
   if exists(newline) {
     if newline == true {
 
-    v(-1 * size + 5pt)
+      v(-1 * size + 5pt)
     } else {
-        v(resolve-point(newline))
+      v(resolve-point(newline))
     }
   }
 }
@@ -688,7 +690,7 @@
   let ref = read-data("data/chinese.yml")
   let chinese = ref.at(key, default: ref.at("math practice"))
   if parentheses == true {
-      chinese = "(" + chinese + ")"
+    chinese = "(" + chinese + ")"
   }
   let chi-size = sink.named().at("size", default: 11) - 3
   let chinese-content = div(chinese, ..sink, size: chi-size, font: "Noto Serif CJK SC")
@@ -703,3 +705,5 @@
     )
   }
 }
+
+// #div("hi", template: "%s.%s")

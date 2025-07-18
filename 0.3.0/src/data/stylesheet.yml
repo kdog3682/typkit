@@ -1,0 +1,65 @@
+title:
+    default:
+        bold: true
+        underline: false
+        size: 36pt
+        centered: true
+        fg: blue
+
+qnum:
+    simple:
+        bold: true
+        size: 0.85em
+        fg: white
+        bg: black
+        centered: true
+        wh: 15
+    default:
+        radius: 2.5
+        fg: black
+        bold: true
+        stroke: 0.5pt
+        size: 0.85em
+        wh: 20
+        inset: 1.5
+        # this is about the size of the small pill
+        align: center + horizon
+level:
+    default:
+        radius: 1.5
+        align: center + horizon
+        size: 1.5em
+        fg: black
+        bg: black.lighten(85%)
+        bold: true
+        inset: 3.5
+    default:
+        italic: true
+        bold: true
+
+
+box:
+  subtext:
+      radius: 3
+      inset: 5
+      stroke: 0.5pt
+      size: 0.55em
+      italic: true
+      centered: true
+
+  above: # it is dotted
+      radius: 3
+      inset: 3
+      stroke: strokes.gentle
+      wh: 2.25em
+      size: 1em
+      centered: true
+
+  middle:
+      radius: 3
+      inset: 3
+      wh: 2.25em
+      stroke: strokes.thin
+      size: 1.15em
+      bold: true
+      centered: true

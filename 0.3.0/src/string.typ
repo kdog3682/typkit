@@ -1,14 +1,14 @@
 #import "is.typ": is-string, is-number, test, is-content
 
 
-#let strfmt(fmt, ..args) = {
+#let strfmt(s, ..args) = {
   let result = ""
   let arg_index = 0
   let i = 0
   
-  while i < fmt.len() {
-    if i < fmt.len() - 1 and fmt.at(i) == "%" {
-      let next_char = fmt.at(i + 1)
+  while i < s.len() {
+    if i < s.len() - 1 and s.at(i) == "%" {
+      let next_char = s.at(i + 1)
       
       if next_char == "%" {
         // Escaped %
@@ -29,7 +29,7 @@
         i += 2
       }
     } else {
-      result += fmt.at(i)
+      result += s.at(i)
       i += 1
     }
   }
@@ -128,4 +128,4 @@
 }
 
 
-// #panic(strfmt("hi%s", 66))
+// #panic(strfmt("%s.%s", 66))
