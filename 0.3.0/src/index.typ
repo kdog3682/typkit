@@ -12,6 +12,7 @@
 #import "colors.typ"
 #import "string.typ"
 #import "typst.typ"
+#import "templates.typ"
 #import "constants.typ": *
 #import "resolve.typ": *
 // #import "colors.typ": color-pair
@@ -158,4 +159,18 @@
         }
     }
     return store
+}
+
+
+
+#let each(n, fn) = {
+    let store = ()
+    for i in range(n){
+        store.push(fn(i))
+    }
+    return store
+}
+
+#let dots(n, fill: black, radius: 0.5pt) = {
+    flex(each(n, x => circle(fill: fill, radius: radius)), spacing: radius * 2)
 }
