@@ -24,3 +24,47 @@ points: "分数"
 # Likely criteria keys that would use tk.chi when chinese: true
 neatness: "整洁度"
 correctness: "正确性"
+
+
+# punctuation
+
+punctuation:
+  period: "。"
+  comma: "，"
+  question_mark: "？"
+  exclamation_mark: "！"
+  colon: "："
+  semicolon: "；"
+  ellipsis: "…"
+  dash: "—"
+  long_dash: "——"
+  foo: "——"
+  pause_mark: "、"
+
+  quotation_mark_left: "“"
+  quotation_mark_right: "”"
+  apostrophe_left: "‘"
+  apostrophe_right: "’"
+  regular_apostrophe: "'"
+
+  parenthesis_left: "（"
+  parenthesis_right: "）"
+  bracket_left: "【"
+  bracket_right: "】"
+  angle_quote_left: "《"
+  angle_quote_right: "》"
+
+
+samples:
+  chinese_tokens:
+    - value: "Margaret"
+      lang: "english"
+      punctuation: 
+        after: "，"
+
+    - value: "那个"
+      lang: "chinese"
+      punctuation: {}
+      pinyin: "shuō"
+
+yoya: 有语

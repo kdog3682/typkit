@@ -16,6 +16,7 @@
     dash: "densely-dotted",
 )
 #let thin = black + 0.5pt
+#let very-thin = black + 0.25pt
 #let solid = black + 0.5pt
 #let normal = black
 

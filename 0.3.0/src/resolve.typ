@@ -25,11 +25,11 @@
 }
 
 #let resolve-point(x) = {
-  if type(x) == length {
-    return x
-  }
   if x == none {
     return
+  }
+  if type(x) == length {
+    return x
   }
   if type(x) == array {
     return x.map(resolve-point)

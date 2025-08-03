@@ -12,7 +12,7 @@
 #import "colors.typ"
 #import "string.typ"
 #import "typst.typ"
-#import "templates.typ"
+// #import "templates.typ"
 #import "constants.typ": *
 #import "resolve.typ": *
 // #import "colors.typ": color-pair
@@ -173,4 +173,152 @@
 
 #let dots(n, fill: black, radius: 0.5pt) = {
     flex(each(n, x => circle(fill: fill, radius: radius)), spacing: radius * 2)
+}
+
+
+#let space-wrap(value, before: none, after: none, dir: h) = {
+  if exists(before) {
+    dir(resolve-point(before))
+  }
+  value
+  if exists(after) {
+    dir(resolve-point(after))
+  }
+}
+#let CHINESE-FONT = "Noto Serif CJK SC"
+
+
+#let up(el, n) = {
+    if n == 0 {
+        el
+    } else {
+        box(el, baseline: -1pt * n)
+    }
+}
+
+
+#let square(..sink) = {
+    let args = sink.pos()
+    let (size, color) = if args.len() == 2 {
+        args
+    } else {
+        (args.first(), blue)
+    }
+    let size = resolve-point(size)
+    box(rect(width: size, height: size, fill: color))
+}
+
+#let multiply(content, n) = {
+    (content, ) * n
+}
+
+
+/// given a sink argument ... normalizes the sink into a flat array for table() consumption.
+#let normalize-table-items(sink) = {
+
+  let pos = sink.pos()
+  return if pos.len() == 2 {
+    array.zip(..pos).flatten()
+  } else {
+    let arg = pos.first()
+    if is-nested-array(arg) {
+      arg.flatten()
+    } else {
+      arg
+    }
+  }
+}
+
+
+/***
+the column-gap is the main gap in the table
+the row-gap applies a row gutter
+the stroke is for the main line going down
+there is no stroke around the table
+
+the inset function uses hamburger-padding to pad the top and bottom (if hamburger-padding) exists. it is pretty nifty.
+
+***/
+#let two-column-table(..args, column-gap: 20pt, row-gap: 10pt, stroke: black + 0.5pt, columns: 2, hamburger-padding: 10pt) = {
+  import "@local/typkit:0.3.0": *
+  let items = normalize-table-items(args)
+  let length = items.len() / 2
+  let stroke-func(col, row) = {
+    if col == 0 {
+      (right: stroke)
+    }
+  }
+  let inset-func(col, row) = {
+    if col == 1 {
+      (left: column-gap)
+    } else if col == 0 {
+      (right: column-gap)
+    }
+
+    if exists(hamburger-padding) {
+        if row == length - 1 {
+          (bottom: hamburger-padding)
+
+        } else if row == 0 {
+          (top: hamburger-padding)
+          (bottom: row-gap)
+        } else {
+          (bottom: row-gap)
+        }
+    } else {
+        if row == length - 1 {
+
+        } else {
+          (bottom: row-gap)
+        }
+    }
+  }
+  grid(..items.map(grid.cell.with(breakable: false)), columns: columns, stroke: stroke-func, inset: inset-func)
+}
+
+#let hr(stroke, above: 0, below: 0, length: 100%) = {
+  space-wrap(line(length: length), before: above, after: below, dir: v)
+}
+
+#let assert-existance(s) = {
+    assert(s != none, "a value is required ... the value is none")
+}
+#let shift(el, up: none, down: none, left: none, right: none) = {
+
+  let vertical-shift(el, n) = {
+    if n == 0 {
+      el
+    } else {
+      box(el, baseline: n)
+    }
+  }
+
+
+  let up = resolve-point(up)
+  let down = resolve-point(down)
+  let right = resolve-point(right)
+  let left = resolve-point(left)
+  let c = el
+  if up != none {
+    c = vertical-shift(c, -1 * up)
+  }
+  if down != none {
+    c = vertical-shift(c, down)
+  }
+
+  if left != none {
+    c = {
+      h(left)
+      c
+    }
+  }
+
+  if right != none {
+    c = {
+      c
+      h(right)
+    }
+  }
+
+  c
 }
