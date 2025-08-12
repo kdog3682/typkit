@@ -150,29 +150,29 @@
   )
 }
 #let repeat(el, count: 6) = {
-    let store = ()
-    for i in range(count) {
-        if type(el) == content {
-            store.push(el)
-        } else {
-            store.push(el())
-        }
+  let store = ()
+  for i in range(count) {
+    if type(el) == content {
+      store.push(el)
+    } else {
+      store.push(el())
     }
-    return store
+  }
+  return store
 }
 
 
 
 #let each(n, fn) = {
-    let store = ()
-    for i in range(n){
-        store.push(fn(i))
-    }
-    return store
+  let store = ()
+  for i in range(n) {
+    store.push(fn(i))
+  }
+  return store
 }
 
 #let dots(n, fill: black, radius: 0.5pt) = {
-    flex(each(n, x => circle(fill: fill, radius: radius)), spacing: radius * 2)
+  flex(each(n, x => circle(fill: fill, radius: radius)), spacing: radius * 2)
 }
 
 
@@ -189,27 +189,42 @@
 
 
 #let up(el, n) = {
-    if n == 0 {
-        el
-    } else {
-        box(el, baseline: -1pt * n)
-    }
+  if n == 0 {
+    el
+  } else {
+    box(el, baseline: -1pt * n)
+  }
+}
+
+#let rec(..sink) = {
+  let args = sink.pos()
+  let length = args.len()
+  let (width, height, color) = if length == 3 {
+    args
+  } else if length == 2 {
+    args + (blue,)
+  } else {
+    (args.first(), args.first(), blue)
+  }
+  let width = resolve-point(width)
+  let height = resolve-point(height)
+  box(rect(width: width, height: height, fill: color))
 }
 
 
 #let square(..sink) = {
-    let args = sink.pos()
-    let (size, color) = if args.len() == 2 {
-        args
-    } else {
-        (args.first(), blue)
-    }
-    let size = resolve-point(size)
-    box(rect(width: size, height: size, fill: color))
+  let args = sink.pos()
+  let (size, color) = if args.len() == 2 {
+    args
+  } else {
+    (args.first(), blue)
+  }
+  let size = resolve-point(size)
+  box(rect(width: size, height: size, fill: color))
 }
 
 #let multiply(content, n) = {
-    (content, ) * n
+  (content,) * n
 }
 
 
@@ -239,49 +254,13 @@ there is no stroke around the table
 the inset function uses hamburger-padding to pad the top and bottom (if hamburger-padding) exists. it is pretty nifty.
 
 ***/
-#let two-column-table(..args, column-gap: 20pt, row-gap: 10pt, stroke: black + 0.5pt, columns: 2, hamburger-padding: 10pt) = {
-  import "@local/typkit:0.3.0": *
-  let items = normalize-table-items(args)
-  let length = items.len() / 2
-  let stroke-func(col, row) = {
-    if col == 0 {
-      (right: stroke)
-    }
-  }
-  let inset-func(col, row) = {
-    if col == 1 {
-      (left: column-gap)
-    } else if col == 0 {
-      (right: column-gap)
-    }
-
-    if exists(hamburger-padding) {
-        if row == length - 1 {
-          (bottom: hamburger-padding)
-
-        } else if row == 0 {
-          (top: hamburger-padding)
-          (bottom: row-gap)
-        } else {
-          (bottom: row-gap)
-        }
-    } else {
-        if row == length - 1 {
-
-        } else {
-          (bottom: row-gap)
-        }
-    }
-  }
-  grid(..items.map(grid.cell.with(breakable: false)), columns: columns, stroke: stroke-func, inset: inset-func)
-}
 
 #let hr(stroke, above: 0, below: 0, length: 100%) = {
   space-wrap(line(length: length), before: above, after: below, dir: v)
 }
 
 #let assert-existance(s) = {
-    assert(s != none, "a value is required ... the value is none")
+  assert(s != none, message: "a value is required ... the value is none")
 }
 #let shift(el, up: none, down: none, left: none, right: none) = {
 
@@ -321,4 +300,48 @@ the inset function uses hamburger-padding to pad the top and bottom (if hamburge
   }
 
   c
+}
+
+
+#let two-column-table(
+  ..args,
+  column-gap: 20pt,
+  row-gap: 10pt,
+  stroke: black + 0.5pt,
+  columns: 2,
+  hamburger-padding: 10pt,
+) = {
+  let items = normalize-table-items(args)
+  let length = items.len() / 2
+  let stroke-func(col, row) = {
+    if col == 0 {
+      (right: stroke)
+    }
+  }
+  let inset-func(col, row) = {
+    if col == 1 {
+      (left: column-gap)
+    } else if col == 0 {
+      (right: column-gap)
+    }
+
+    if exists(hamburger-padding) {
+      if row == length - 1 {
+        (bottom: hamburger-padding)
+
+      } else if row == 0 {
+        (top: hamburger-padding)
+        (bottom: row-gap)
+      } else {
+        (bottom: row-gap)
+      }
+    } else {
+      if row == length - 1 {
+
+      } else {
+        (bottom: row-gap)
+      }
+    }
+  }
+  grid(..items.map(grid.cell.with(breakable: false)), columns: columns, stroke: stroke-func, inset: inset-func)
 }

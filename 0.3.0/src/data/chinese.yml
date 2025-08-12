@@ -37,7 +37,8 @@ punctuation:
   semicolon: "；"
   ellipsis: "…"
   dash: "—"
-  long_dash: "——"
+  long_dash: "——" 
+  a:         "——"
   foo: "——"
   pause_mark: "、"
 
@@ -59,12 +60,18 @@ samples:
   chinese_tokens:
     - value: "Margaret"
       lang: "english"
-      punctuation: 
-        after: "，"
+      punctuation: ["", "——"]
 
-    - value: "那个"
+    - value: "有语"
       lang: "chinese"
-      punctuation: {}
-      pinyin: "shuō"
+      pinyin: "abc"
+
+    - value: "Margaret"
+      lang: "english"
+      punctuation: ["", "：“"]
+
+    - value: "有语"
+      lang: "chinese"
+      pinyin: "abc"
 
 yoya: 有语
