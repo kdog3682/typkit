@@ -4,6 +4,7 @@
   spacing: 5pt,
   dir: ltr,
   centered: true,
+  align: none,
   ..sink,
 ) = {
   let horizontal = dir == ltr
@@ -17,7 +18,7 @@
     return items.join()
   }
 
-  let (align, columns) = if horizontal == true {
+  let (_align, columns) = if horizontal == true {
     if centered == true {
     (horizon, items.len())
     } else {
@@ -32,9 +33,23 @@
     }
 
   }
+  if align != none {
+      if dir == ltr {
+          if align == center {
+               align = horizon
+          }
+          if align == left {
+               align = top 
+          }
+          if align == right {
+               align =  bottom 
+          }
+      }
+      _align = align
+  }
   grid(
     ..items, columns: columns, gutter: spacing,
-    align: align,
+    align: _align,
   )
 }
 

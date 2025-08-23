@@ -13,7 +13,8 @@
 #import "string.typ"
 #import "typst.typ"
 // #import "templates.typ"
-#import "constants.typ": *
+#import "constants.typ"
+
 #import "resolve.typ": *
 // #import "colors.typ": color-pair
 
@@ -206,8 +207,8 @@
   } else {
     (args.first(), args.first(), blue)
   }
-  let width = resolve-point(width)
-  let height = resolve-point(height)
+  let width = resolve-point(width) * 10
+  let height = resolve-point(height) * 10
   box(rect(width: width, height: height, fill: color))
 }
 
@@ -239,21 +240,11 @@
     if is-nested-array(arg) {
       arg.flatten()
     } else {
-      arg
+      pos
     }
   }
 }
 
-
-/***
-the column-gap is the main gap in the table
-the row-gap applies a row gutter
-the stroke is for the main line going down
-there is no stroke around the table
-
-the inset function uses hamburger-padding to pad the top and bottom (if hamburger-padding) exists. it is pretty nifty.
-
-***/
 
 #let hr(stroke, above: 0, below: 0, length: 100%) = {
   space-wrap(line(length: length), before: above, after: below, dir: v)
@@ -303,45 +294,9 @@ the inset function uses hamburger-padding to pad the top and bottom (if hamburge
 }
 
 
-#let two-column-table(
-  ..args,
-  column-gap: 20pt,
-  row-gap: 10pt,
-  stroke: black + 0.5pt,
-  columns: 2,
-  hamburger-padding: 10pt,
-) = {
-  let items = normalize-table-items(args)
-  let length = items.len() / 2
-  let stroke-func(col, row) = {
-    if col == 0 {
-      (right: stroke)
-    }
-  }
-  let inset-func(col, row) = {
-    if col == 1 {
-      (left: column-gap)
-    } else if col == 0 {
-      (right: column-gap)
-    }
 
-    if exists(hamburger-padding) {
-      if row == length - 1 {
-        (bottom: hamburger-padding)
-
-      } else if row == 0 {
-        (top: hamburger-padding)
-        (bottom: row-gap)
-      } else {
-        (bottom: row-gap)
-      }
-    } else {
-      if row == length - 1 {
-
-      } else {
-        (bottom: row-gap)
-      }
-    }
-  }
-  grid(..items.map(grid.cell.with(breakable: false)), columns: columns, stroke: stroke-func, inset: inset-func)
+#let parse-rects(s) = {
+  let colors = constants.ROYGBIV9
+  let coords = s.matches(regex("(-?\\d+)\\s*,\\s*(-?\\d+)")).map(m => (int(m.captures.at(0)), int(m.captures.at(1))))
+  return coords.enumerate().map(((i, x)) => rec(..x, colors.at(i)))
 }
