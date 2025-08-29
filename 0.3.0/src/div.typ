@@ -321,7 +321,9 @@
     } else {
       content.join()
     }
-  } else if content != none {
+  } 
+
+  if content != none and template != none {
     content = contentify(content, template: template)
   } else {
     // panic("HiiI")
