@@ -21,6 +21,10 @@
 #let normal = black
 
 
+#let solid = (
+    thickness: 0.75pt,
+)
+
 #let gray = (
     thickness: 0.5pt,
     dash: "densely-dotted",

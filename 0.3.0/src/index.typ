@@ -6,6 +6,7 @@
 #import "is.typ": *
 #import "components.typ": *
 #import "staging.typ": *
+#import "pytypst-adapter.typ": *
 #import "patterns.typ"
 #import "strokes.typ"
 #import "font.typ"

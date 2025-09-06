@@ -1,4 +1,3 @@
-
 #import "base.typ": arrow, read-data
 #import "ao.typ": merge-attrs, filter-none
 #import "layout.typ": flex
@@ -9,7 +8,8 @@
 #import "./patterns.typ"
 #let strokes = dictionary(strokes)
 #let patterns = dictionary(patterns)
-// Store original functions
+
+// Preserve originals
 #let _strike = strike
 #let _underline = underline
 #let _pad = pad
@@ -26,103 +26,43 @@
 #let is-math-content(x) = {
   type(x) == content and x.func() == math.equation
 }
-// Helper function to filter out none values
 
-// Style lookup dictionaries
+// Style dictionaries (unchanged)
 #let underline_styles = (
-  "default": (
-    stroke: black + 0.5pt,
-    offset: 2pt,
-  ),
-  "thick": (
-    stroke: black + 1pt,
-    offset: 2pt,
-  ),
-  "thin": (
-    stroke: black + 0.3pt,
-    offset: 1.5pt,
-  ),
-  "blue": (
-    stroke: blue + 0.5pt,
-    offset: 2pt,
-  ),
-  "red": (
-    stroke: red + 0.5pt,
-    offset: 2pt,
-  ),
-  "dotted": (
-    stroke: (
-      paint: black,
-      dash: "dotted",
-      thickness: 0.5pt,
-    ),
-    offset: 2pt,
-  ),
-  "dashed": (
-    stroke: (
-      paint: black,
-      dash: "dashed",
-      thickness: 0.5pt,
-    ),
-    offset: 2pt,
-  ),
+  "default": (stroke: black + 0.5pt, offset: 2pt),
+  "thick": (stroke: black + 1pt, offset: 2pt),
+  "thin": (stroke: black + 0.3pt, offset: 1.5pt),
+  "blue": (stroke: blue + 0.5pt, offset: 2pt),
+  "red": (stroke: red + 0.5pt, offset: 2pt),
+  "dotted": (stroke: (paint: black, dash: "dotted", thickness: 0.5pt), offset: 2pt),
+  "dashed": (stroke: (paint: black, dash: "dashed", thickness: 0.5pt), offset: 2pt),
 )
 
 #let strike_styles = (
   "default": (:),
-  "thick": (
-    stroke: black + 1pt,
-    offset: 0pt,
-  ),
-  "thin": (
-    stroke: black + 0.3pt,
-    offset: 0pt,
-  ),
-  "blue": (
-    stroke: blue + 0.5pt,
-    offset: 0pt,
-  ),
+  "thick": (stroke: black + 1pt, offset: 0pt),
+  "thin": (stroke: black + 0.3pt, offset: 0pt),
+  "blue": (stroke: blue + 0.5pt, offset: 0pt),
   "red": (stroke: red),
-  "dotted": (
-    stroke: (
-      paint: black,
-      dash: "dotted",
-      thickness: 0.5pt,
-    ),
-    offset: 0pt,
-  ),
-  "dashed": (
-    stroke: (
-      paint: black,
-      dash: "dashed",
-      thickness: 0.5pt,
-    ),
-    offset: 0pt,
-  ),
+  "dotted": (stroke: (paint: black, dash: "dotted", thickness: 0.5pt), offset: 0pt),
+  "dashed": (stroke: (paint: black, dash: "dashed", thickness: 0.5pt), offset: 0pt),
 )
 
-// Complete resolver function (from previous example)
+// === Utilities ===
 #let resolve-unit(key, value) = {
-  // First handle color properties
   let ty = type(value)
   if ty == str {
-    if key in (
-      "fg",
-      "bg",
-      "fill",
-      "stroke",
-      "align",
-    ) {
+    if key in ("fg", "bg", "fill", "stroke", "align") {
       if key == "fill" {
-        let stroke = patterns.at(value, default: none)
-        if exists(stroke) {
-          return stroke
+        let pat = patterns.at(value, default: none)
+        if exists(pat) {
+          return pat
         }
       }
       if key == "stroke" {
-        let stroke = strokes.at(value, default: none)
-        if exists(stroke) {
-          return stroke
+        let st = strokes.at(value, default: none)
+        if exists(st) {
+          return st
         }
       }
       return eval(value, scope: ("strokes": strokes, "patterns": patterns))
@@ -135,44 +75,32 @@
     return {
       if key == "rotate" {
         value * 1deg
-      } else if key in (
-        "width", "height", "w", "h",
-        "x", "y", "top", "left",
-        "right", "bottom",
-      ) {
+      } else if key in ("width", "height", "w", "h", "x", "y", "top", "left", "right", "bottom") {
         value * 1pt
-      } else if key in (
-        "font-size", "size", "indent", "margin",
-        "padding", "line-spacing",
-      ) {
+      } else if key in ("font-size", "size", "indent", "margin", "padding", "line-spacing") {
         value * 1em
       } else {
-        // Default to points
         value * 1pt
       }
     }
-  }
-
-  // Fallback for other cases
-  else {
+  } else {
     value
   }
 }
 
 #let resolve-class(obj) = {
-  let store = (:)
-  for (key, value) in obj {
-    store.insert(key, resolve-unit(key, value))
+  let out = (:)
+  for (k, v) in obj {
+    out.insert(k, resolve-unit(k, v))
   }
-  return store
+  out
 }
 
 #let placer(place: "center", delta: 2pt, dx: none, dy: none, body) = {
-  // Define the placement mappings
   if type(place) == alignment {
     return _place(body, place, dx: dx, dy: dy)
   }
-  let placements = (
+  let map = (
     "nw": (align: top + left, dx: 1, dy: 1),
     "n": (align: top, dx: 0, dy: 1),
     "ne": (align: top + right, dx: -1, dy: 1),
@@ -183,181 +111,70 @@
     "se": (align: bottom + right, dx: -1, dy: -1),
     "center": (align: center, dx: 0, dy: 0),
   )
-
-  // Get the placement info or default to center
-  let info = placements.at(place)
+  let info = map.at(place)
   _place(body, info.align, dx: info.dx * delta, dy: info.dy * delta)
 }
+
 #let contentify(x, template: none) = {
   if type(x) == content {
-    return x
+    x
+  } else if template != none {
+    text(strfmt(template, x))
+  } else {
+    text(str(x))
+  }
+}
+
+// === New small helpers for div ===
+
+#let _coerce-content(raw, flex: false, spacing: none, dir: ltr, markup: false, template: none) = {
+  if raw == none {
+    return none
+  }
+  let t = type(raw)
+  let c = raw
+  if t == int or t == float {
+    c = str(c)
+  } else if c == false {
+    return hide(text("hi"))
+  } else if markup == true and t == str {
+    c = eval(c, mode: "markup")
+  } else if t == array {
+    c = if flex == true {
+      _flex(..raw, spacing: spacing, dir: dir)
+    } else {
+      raw.join()
+    }
   }
   if template != none {
-    return text(strfmt(template, x))
+    c = contentify(c, template: template)
   }
-  return text(str(x))
+  c
 }
-#let div(
-  ..sink,
-  // Box attributes
-  width: none, height: none, bg: none,
-  wh: none, stroke: none, radius: none,
-  colors: none,
-  wrapper: box,
-  markup: false,
-  newline: none,
-  chinese: false,
-  inset: none, outset: none, clip: none,
-  template: none,
+
+#let _apply-text(
+  result,
+  font: none,
+  fg: none,
+  size: none,
+  style: none,
+  weight: none,
+  slant: none,
+  tracking: none,
   text-stroke: none,
-  caption: none,
-  hidden: false,
-  dx: 0pt, dy: 0pt,
-  // Text attributes
-  font: none, fg: none, size: none,
-  fill: none, bold: none, italic: none,
-  style: none, weight: none, slant: none,
-  text-mode: none,
-  tracking: none, class: none, pad-left: none,
-  margin-left: none, margin-bottom: none,
-  margin-top: none, margin-right: none,
-  spacing: none, baseline: none, overhang: false,
-  dir: ltr,
-  place: none,
-  delta: 0pt,
-  caption-position: "bottom",
-  // Underline attributes
-  underline: none,
-  line: none,
-  line-above: 20,
-  line-below: 30,
-  // Strike attributes
-  strike: none, scale: none,
-  // Alignment (happens before box)
-  align: none,
-  northwest: none,
-  southeast: none,
-  southwest: none,
-  no-none: false,
-  northeast: none,
-  north: none,
-  south: none,
-  east: none,
-  value: none,
-  west: none,
-  // Rotation (happens after box)
-  rotate: none, circle: none, centered: false,
+  baseline: none,
+  overhang: false,
+  bold: none,
+  italic: none,
+  src-content: none,
 ) = {
-
-  let args = sink.pos()
-
-  if chinese == true {
-
-    font = "Noto Serif CJK SC"
-    size = 0.75em
-    let ref = read-data("data/chinese.yml")
-    let chinese = ref.at(args.first(), default: ref.at("math practice"))
-    args = (chinese,)
-    // let chinese-content = div(chinese, ..sink, size: 0.75em, )
+  if result == none {
+    return none
   }
-
-  if northwest != none {
-    args.push(div(northwest, place: "nw"))
-  }
-  if southeast != none {
-    args.push(div(southeast, place: "se"))
-  }
-  if southwest != none {
-    args.push(div(southwest, place: "sw"))
-  }
-  if northeast != none {
-    args.push(div(northeast, place: "ne"))
-  }
-  if north != none {
-    args.push(div(north, place: "n"))
-  }
-  if south != none {
-    args.push(div(south, place: "s"))
-  }
-  if east != none {
-    args.push(div(east, place: "e"))
-  }
-  if west != none {
-    args.push(div(west, place: "w"))
-  }
-  let content = if args.len() == 1 {
-    args.first()
-  } else if args.len() == 0 {
-    none
-  } else {
-    // panic("arrays are not allowed for div. only 1 or 0 positional args is allowed")
-    if flex == true {
-      _flex(..args, spacing: spacing, dir: dir)
-    } else {
-      args.join()
-    }
-    // panic("div is only allowed to have 1 or 0 positional args.")
-  }
-  if class != none {
-    return div(
-      content,
-      ..resolve-class(class),
-    )
-  }
-  // Process content with the combined functionalities
-  // set par(spacing: 1em)
-  let t = type(content)
-  if t == int or t == float {
-    content = str(content)
-  } else if content == false {
-    content = text("hi")
-    hidden = true
-  } else if markup == true and t == str {
-    content = eval(content, mode: "markup")
-  } else if t == array {
-    panic("arrays are not allowed for div")
-    content = if flex == true {
-      _flex(..content, spacing: spacing, dir: dir)
-    } else {
-      content.join()
-    }
-  } 
-
-  if content != none and template != none {
-    content = contentify(content, template: template)
-  } else {
-    // panic("HiiI")
-  }
-  let result = content
-  if centered == true {
-    align = center + horizon
-  }
-  if wh != none {
-    wh = resolve-point(wh)
-    width = wh
-    height = wh
-  }
-  if fill != none {
-    bg = fill
-  }
-
-  if colors != none {
-    bg = colors.last()
-    fg = colors.first()
-  }
-
-  if content == none {
-    if width == none or height == none {
-      return
-    }
-  }
-
-  // Apply text formatting
-  let size = resolve-point(size)
-  let text_attrs = (
+  let attrs = filter-none((
     font: font,
     fill: fg,
-    size: size,
+    size: resolve-point(size),
     style: style,
     weight: weight,
     slant: slant,
@@ -365,179 +182,178 @@
     stroke: text-stroke,
     baseline: baseline,
     overhang: overhang,
-  )
-  if bold == true {
-    text_attrs.weight = "bold"
+  ))
+  let out = if attrs.len() > 0 {
+    text(result, ..attrs)
+  } else if type(result) != _content {
+    text(result)
+  } else {
+    result
   }
-  if italic == true {
-    text_attrs.style = "italic"
+  if bold != none and is-math-content(src-content) {
+    out = math.equation(math.bold(out))
   }
+  if italic == true and not is-math-content(src-content) {
+    out = emph(out)
+  }
+  out
+}
 
-  let filtered_text_attrs = filter-none(text_attrs)
-  if result != none {
-    if filtered_text_attrs.len() > 0 {
-      result = text(
-        result,
-        ..filtered_text_attrs,
-      )
-    } else if type(result) != _content {
-      result = text(result)
+#let _apply-decorations(node, strike: none, underline: none) = {
+  let out = node
+  if strike != none {
+    let sattrs = if strike == true {
+      strike_styles.default
+    } else if type(strike) == str {
+      strike_styles.at(strike, default: strike_styles.default)
+    } else if type(strike) == dictionary {
+      strike
+    } else {
+      (:)
     }
-    if bold != none and is-math-content(content) {
-      result = math.equation(math.bold(result))
+    out = _strike(out, ..sattrs)
+  }
+  if underline != none and underline != false {
+    let uattrs = if underline == true {
+      underline_styles.default
+    } else if type(underline) == str {
+      underline_styles.at(underline, default: underline_styles.default)
+    } else if type(underline) == dictionary {
+      underline
+    } else {
+      (:)
     }
+    out = _underline(out, ..uattrs)
+  }
+  out
+}
 
-    if strike != none {
-      let strike_attrs = (:)
+#let _pre-align(node, align: none, centered: false) = {
+  let a = if centered == true {
+    center + horizon
+  } else {
+    align
+  }
+  if a != none {
+    _align(node, a)
+  } else {
+    node
+  }
+}
 
-      let strike_attrs = if strike == true {
-        strike_styles.default
-      } else if type(strike) == str {
-        if strike in strike_styles {
-          strike_styles.at(strike)
-        } else {
-          strike_styles.default
-        }
-      } else if type(strike) == dictionary {
-        strike
-      }
-
-      result = _strike(result, ..strike_attrs)
-    }
-
-    // Apply underline if specified
-    if underline != none and underline != false {
-      let underline_attrs = (:)
-
-      if underline == true {
-        // Use default underline style
-        underline_attrs = underline_styles.default
-      } else if type(underline) == str {
-        // Lookup style by name
-        underline_attrs = if underline in underline_styles {
-          underline_styles.at(underline)
-        } else {
-          underline_styles.default
-        }
-      } else if type(underline) == dictionary {
-        // Use custom underline attributes
-        underline_attrs = underline
-      }
-
-      result = _underline(result, ..underline_attrs)
-    }
-
-    // Apply alignment before box
-    if align != none {
-      result = _align(result, align)
+#let _wrap-shape(
+  node,
+  circle: false,
+  bg: none,
+  stroke: none,
+  radius: none,
+  inset: none,
+  outset: none,
+  clip: none,
+  width: none,
+  height: none,
+  wrapper: box,
+) = {
+  let s = if type(stroke) == str {
+    strokes.at(stroke)
+  } else {
+    stroke
+  }
+  if circle == true {
+    let cattrs = filter-none((fill: bg, stroke: s, radius: radius))
+    return if cattrs.len() > 0 {
+      _circle(node, ..cattrs)
+    } else {
+      node
     }
   }
-
-  let circle_attrs = (
-    fill: bg,
-    stroke: stroke,
-    radius: radius,
-  )
-
-  // Apply box
-  if type(stroke) == str {
-    stroke = strokes.at(stroke)
-  }
-  let box_attrs = (
+  let battrs = filter-none((
     width: width,
     height: height,
     fill: bg,
-    stroke: stroke,
+    stroke: s,
     radius: radius,
     inset: inset,
     outset: outset,
     clip: clip,
-  )
-
-  let filtered_circle_attrs = filter-none(circle_attrs)
-  if circle == true and filtered_circle_attrs.len() > 0 {
-    // panic(filtered_circle_attrs, circle_attrs)
-    result = _circle(
-      result,
-      ..filtered_circle_attrs,
-    )
-  } else if wrapper == box {
-    let filtered_box_attrs = filter-none(box_attrs)
-    if filtered_box_attrs.len() > 0 {
-      result = box(
-        result,
-        ..filtered_box_attrs,
-      )
-    }
-  } else if wrapper == block {
-
-    let filtered_box_attrs = filter-none(box_attrs)
-    if filtered_box_attrs.len() > 0 {
-      // 2025-04-15 aicmp: turn this to block
-      result = block(
-        result,
-        ..filtered_box_attrs,
-      )
-    }
+  ))
+  if battrs.len() == 0 {
+    return node
   }
+  if wrapper == block {
+    return block(node, ..battrs)
+  }
+  // default box
+  box(node, ..battrs)
+}
 
-  // Apply rotation after box
+#let _apply-rotation(node, rotate: none) = {
   if rotate != none {
-    result = _rotate(result, rotate)
+    _rotate(node, rotate)
+  } else {
+    node
   }
+}
+
+#let _apply-margins(
+  node,
+  pad-left: none,
+  margin-left: none,
+  margin-right: none,
+  margin-top: none,
+  margin-bottom: none,
+) = {
+  let out = node
   if pad-left != none {
-    result = _pad(result, left: pad-left)
-  }
-  if margin-bottom != none {
-    result = _pad(
-      result,
-      bottom: margin-bottom,
-    )
+    out = _pad(out, left: pad-left)
   }
   if margin-top != none {
-    result = _pad(
-      result,
-      bottom: margin-top,
-    )
+    out = _pad(out, top: margin-top)
+  }
+  if margin-bottom != none {
+    out = _pad(out, bottom: margin-bottom)
   }
   if margin-left != none {
-    result = _pad(
-      result,
-      bottom: margin-left,
-    )
+    out = _pad(out, left: margin-left)
   }
   if margin-right != none {
-    result = _pad(
-      result,
-      bottom: margin-right,
-    )
+    out = _pad(out, right: margin-right)
   }
-  if place != none {
-    result = placer(place: place, delta: delta, dx: dx, dy: dy, result)
-  }
-  if scale != none {
-    result = _scale(
-      result,
-      scale,
-      reflow: true,
-    )
-  }
-  if hidden == true {
-    return hide(result)
-  }
+  out
+}
 
-  if caption != none {
-    if caption-position == "above" {
-      flex(caption, result, dir: ttb, spacing: 10pt)
-    } else {
-      flex(result, caption, dir: ttb, spacing: 10pt)
-    }
+#let _apply-placement(node, place: none, delta: 0pt, dx: none, dy: none) = {
+  if place != none {
+    placer(place: place, delta: delta, dx: dx, dy: dy, node)
   } else {
-    result
+    node
   }
+}
+
+#let _apply-scale(node, scale: none) = {
+  if scale != none {
+    _scale(node, scale, reflow: true)
+  } else {
+    node
+  }
+}
+
+#let _apply-caption(node, caption: none, pos: "bottom") = {
+  if caption == none {
+    return node
+  }
+  if pos == "above" {
+    flex(caption, node, dir: ttb, spacing: 10pt)
+  } else {
+    flex(node, caption, dir: ttb, spacing: 10pt)
+  }
+}
+
+#let _apply-rule-and-newline(node, size: none, line: none, line-above: 20, line-below: 30, newline: none) = {
+  let out = node
   if exists(line) {
     if line == true {
-      v(-0.85 * size)
+      v(-0.85 * resolve-point(size))
       _line(length: 100%)
       v(1pt * line-below)
     } else {
@@ -548,14 +364,263 @@
   }
   if exists(newline) {
     if newline == true {
-
-      v(-1 * size + 5pt)
+      v(-1 * resolve-point(size) + 5pt)
     } else {
       v(resolve-point(newline))
     }
   }
+  out
 }
 
+#let _overlay-anchors(
+  args,
+  north: none,
+  south: none,
+  east: none,
+  west: none,
+  ne: none,
+  nw: none,
+  se: none,
+  sw: none,
+) = {
+  let out = args
+  if nw != none {
+    out.push(div(nw, place: "nw"))
+  }
+  if se != none {
+    out.push(div(se, place: "se"))
+  }
+  if sw != none {
+    out.push(div(sw, place: "sw"))
+  }
+  if ne != none {
+    out.push(div(ne, place: "ne"))
+  }
+  if north != none {
+    out.push(div(north, place: "n"))
+  }
+  if south != none {
+    out.push(div(south, place: "s"))
+  }
+  if east != none {
+    out.push(div(east, place: "e"))
+  }
+  if west != none {
+    out.push(div(west, place: "w"))
+  }
+  out
+}
+
+#let contentify-positional(args, flex: false, spacing: none, dir: ltr) = {
+  if args.len() == 0 {
+    none
+  } else if args.len() == 1 {
+    args.first()
+  } else {
+    if flex == true {
+      _flex(..args, spacing: spacing, dir: dir)
+    } else {
+      args.join()
+    }
+  }
+}
+
+#let looks-like-number(s) = {
+  type(s) == float or type(s) == int or s.match(regex("^\d+(?:\.\d+)?$")) != none
+}
+
+#let txt(s, font: none, fill: none, size: none, bold: false, italic: false, centered: true) = {
+  let attrs = (:)
+  if fill != none {
+    attrs.insert("fill", fill)
+  }
+  if size != none {
+    attrs.insert("size", size)
+  }
+  let p = text(s, ..attrs)
+  let q = if bold == true {
+    if is-math-content(s) {
+      math.bold(p)
+    } else {
+      strong(p)
+    }
+  } else {
+    p
+  }
+  if centered == true {
+    q = _align(q, center + horizon)
+  }
+  q
+}
+
+#let chi(key, singleton: false, spacing: 4pt, parentheses: true, dir: ttb, ..sink) = {
+  let ref = read-data("data/chinese.yml")
+  let chinese = ref.at(key, default: ref.at("math practice"))
+  if parentheses == true {
+    chinese = "(" + chinese + ")"
+  }
+  let chi-size = sink.named().at("size", default: 11) - 3
+  let chinese-content = div(chinese, ..sink, size: chi-size, font: "Noto Serif CJK SC")
+  if singleton == true {
+    chinese-content
+  } else {
+    stack(spacing: spacing, dir: dir, div(key, ..sink), chinese-content)
+  }
+}
+
+// === Refactored div ===
+#let div(
+  ..sink,
+  // Box & visuals
+  width: none, height: none, bg: none, wh: none, stroke: none, radius: none, colors: none,
+  wrapper: box, markup: false, inset: none, outset: none, clip: none,
+  // Flow helpers
+  newline: none, caption: none, caption-position: "bottom", hidden: false,
+  dx: 0pt, dy: 0pt, place: none, delta: 0pt, rotate: none, circle: none, centered: false, scale: none,
+  // Text
+  font: none, fg: none, size: none, fill: none, bold: none, italic: none, style: none, weight: none, slant: none,
+  text-mode: none, tracking: none, pad-left: none, margin-left: none, margin-bottom: none, margin-top: none, margin-right: none,
+  spacing: none, baseline: none, overhang: false, dir: ltr,
+  // Decorations
+  underline: none, line: none, line-above: 20, line-below: 30, strike: none, text-stroke: none,
+  // Alignment before box
+  align: none, northwest: none, southeast: none, southwest: none, northeast: none, north: none, south: none, east: none, west: none,
+  // Extras
+  value: none, flex: none, class: none, template: none, no-none: false, chinese: false,
+) = {
+  // 1) Gather positional content (with overlays)
+  let args = sink.pos()
+
+  if chinese == true {
+    font = "Noto Serif CJK SC"
+    size = 0.75em
+    let ref = read-data("data/chinese.yml")
+    let chinese-text = ref.at(args.first(), default: ref.at("math practice"))
+    args = (chinese-text,)
+  }
+
+  args = _overlay-anchors(
+    args,
+    north: north,
+    south: south,
+    east: east,
+    west: west,
+    ne: northeast,
+    nw: northwest,
+    se: southeast,
+    sw: southwest,
+  )
+
+  let content = contentify-positional(args, flex: flex == true, spacing: spacing, dir: dir)
+
+  if class != none {
+    return div(content, ..resolve-class(class))
+  }
+
+  // 2) Normalize aliases and quick synonyms
+  if wh != none {
+    let whv = resolve-point(wh)
+    width = whv
+    height = whv
+  }
+  if fill != none {
+    bg = fill
+  }
+  if colors != none {
+    bg = colors.last()
+    fg = colors.first()
+  }
+  if centered == true {
+    align = center + horizon
+  }
+
+  // If no content but sized box requested, allow empty box
+  if content == none and (width == none or height == none) {
+    return
+  }
+
+  // 3) Coerce/prepare content
+  let prepared = _coerce-content(
+    content,
+    flex: flex == true,
+    spacing: spacing,
+    dir: dir,
+    markup: markup,
+    template: template,
+  )
+
+  // 4) Text formatting
+  let texted = _apply-text(
+    prepared,
+    font: font,
+    fg: fg,
+    size: size,
+    style: style,
+    weight: weight,
+    slant: slant,
+    tracking: tracking,
+    text-stroke: text-stroke,
+    baseline: baseline,
+    overhang: overhang,
+    bold: bold,
+    italic: italic,
+    src-content: content,
+  )
+
+  // 5) Decorations and pre-alignment
+  let decorated = _apply-decorations(texted, strike: strike, underline: underline)
+  let aligned = if align != none {
+    _pre-align(decorated, align: align)
+  } else {
+    decorated
+  }
+
+  // 6) Shape / box wrapping
+  let wrapped = _wrap-shape(
+    aligned,
+    circle: circle == true,
+    bg: bg,
+    stroke: stroke,
+    radius: radius,
+    inset: inset,
+    outset: outset,
+    clip: clip,
+    width: width,
+    height: height,
+    wrapper: wrapper,
+  )
+
+  // 7) Post transforms
+  let rotated = _apply-rotation(wrapped, rotate: rotate)
+  let padded = _apply-margins(
+    rotated,
+    pad-left: pad-left,
+    margin-left: margin-left,
+    margin-right: margin-right,
+    margin-top: margin-top,
+    margin-bottom: margin-bottom,
+  )
+  let placed = _apply-placement(padded, place: place, delta: delta, dx: dx, dy: dy)
+  let scaled = _apply-scale(placed, scale: scale)
+
+  if hidden == true {
+    return hide(scaled)
+  }
+
+  // 8) Caption and flow rules
+  let withcap = _apply-caption(scaled, caption: caption, pos: caption-position)
+
+  _apply-rule-and-newline(
+    withcap,
+    size: size,
+    line: line,
+    line-above: line-above,
+    line-below: line-below,
+    newline: newline,
+  )
+}
+
+// === Convenience utilities kept from original ===
 #let myStyles = (
   rotate: 90,
   width: 200,
@@ -571,12 +636,8 @@
     none
   }
   let attrs = resolve-class(merge-attrs(b, sink.named()))
-  return div(a, ..attrs)
+  div(a, ..attrs)
 }
-
-// #panic(clsx("hi     l,", myStyles, rotate: 120deg, stroke: "gentle", fill: "circles"))
-
-
 
 #let nd(numerator, denominator, ..sink) = {
   let builder(x) = {
@@ -589,7 +650,7 @@
   let n = builder(numerator)
   let d = builder(denominator)
   let expr = $#n/#move(d, dy: 0.5pt)$
-  return div(expr, ..sink)
+  div(expr, ..sink)
 }
 
 #let shape(
@@ -627,10 +688,8 @@
   } else {
     horo.push(body)
   }
-
   let horo = flex(horo, dir: ltr, spacing: arrow-spacing)
   let vertical = ()
-
   if top != none and bottom != none {
     vertical.push(top)
     vertical.push(arrow(arrow-length, angle: 90deg, dy: -6pt))
@@ -649,63 +708,6 @@
   } else {
     vertical.push(horo)
   }
-
   flex(vertical, dir: ttb, spacing: arrow-spacing)
 }
 
-
-#let looks-like-number(s) = {
-  return type(s) == float or type(s) == int or s.match(regex("^\d+(?:\.\d+)?$")) != none
-}
-
-
-#let txt(s, font: none, fill: none, size: none, bold: false, italic: false, centered: true) = {
-
-  let attrs = (:)
-  if fill != none {
-    attrs.insert("fill", fill)
-  }
-  if size != none {
-    attrs.insert("size", size)
-  }
-
-  let p = text(s, ..attrs)
-
-  let q = if bold == true {
-    if is-math-content(s) {
-      math.bold(p)
-    } else {
-      strong(p)
-    }
-  } else {
-    p
-  }
-
-  if centered == true {
-    q = align(q, center + horizon)
-  }
-  return q
-}
-
-
-#let chi(key, singleton: false, spacing: 4pt, parentheses: true, dir: ttb, ..sink) = {
-  let ref = read-data("data/chinese.yml")
-  let chinese = ref.at(key, default: ref.at("math practice"))
-  if parentheses == true {
-    chinese = "(" + chinese + ")"
-  }
-  let chi-size = sink.named().at("size", default: 11) - 3
-  let chinese-content = div(chinese, ..sink, size: chi-size, font: "Noto Serif CJK SC")
-  if singleton == true {
-    chinese-content
-  } else {
-    stack(
-      spacing: spacing,
-      dir: dir,
-      div(key, ..sink),
-      chinese-content,
-    )
-  }
-}
-
-// #div("hi", template: "%s.%s")
