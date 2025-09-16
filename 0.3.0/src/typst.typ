@@ -1,6 +1,7 @@
 #let table = table
 #let content = content
 #let stack = stack
+#let align = align
 #let box = box
 #let block = block
 #let scale = scale

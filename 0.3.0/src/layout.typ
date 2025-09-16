@@ -1,12 +1,16 @@
 #import "ao.typ": merge-attrs, filter-none, to-array, mapfilter, partition
 #import "is.typ": is-number, is-length
 #let flex(
-  spacing: 5pt,
+  spacing: none,
   dir: ltr,
   centered: true,
   align: none,
+  line: none,
   ..sink,
 ) = {
+  if spacing == none {
+    spacing = 5pt
+  }
   let horizontal = dir == ltr
   let base = if sink.pos().len() == 1 {
     to-array(sink.pos().first())
@@ -20,32 +24,32 @@
 
   let (_align, columns) = if horizontal == true {
     if centered == true {
-    (horizon, items.len())
+      (horizon, items.len())
     } else {
 
-    (top, items.len())
+      (top, items.len())
     }
   } else {
     if centered == true {
-        (center, 1)
-    } else  {
-        (left, 1)
+      (center, 1)
+    } else {
+      (left, 1)
     }
 
   }
   if align != none {
-      if dir == ltr {
-          if align == center {
-               align = horizon
-          }
-          if align == left {
-               align = top 
-          }
-          if align == right {
-               align =  bottom 
-          }
+    if dir == ltr {
+      if align == center {
+        align = horizon
       }
-      _align = align
+      if align == left {
+        align = top
+      }
+      if align == right {
+        align = bottom
+      }
+    }
+    _align = align
   }
   grid(
     ..items, columns: columns, gutter: spacing,
@@ -124,7 +128,7 @@
     if a == none and c == none {
       return align(b, center)
     }
-    
+
     // Handle all possible combinations for 3 arguments
     if a == none and b == none {
       // Only c is present - align right
@@ -133,8 +137,8 @@
       // b and c are present - b in middle, c at right
       // return stack(h(2fr), b, h(1fr), c, dir: ltr)
       return {
-          place(b, center)
-          place(c, right)
+        place(b, center)
+        place(c, right)
       }
     } else if b == none and c == none {
       // Only a is present - align left
@@ -145,14 +149,11 @@
     } else if c == none and a != none and b != none {
       // a and b are present - a at left, b in middle
       return stack(a, h(1fr), b, h(1fr), dir: ltr)
-    } 
-else if a == none and c != none and b != none {
+    } else if a == none and c != none and b != none {
       // a and b are present - a at left, b in middle
       // plac
       return stack(h(1fr), b, h(1fr), c, dir: ltr)
-    } 
-
-    else {
+    } else {
       // All three arguments are present (a, b, c)
       return stack(a, h(1fr), b, h(1fr), c, dir: ltr)
     }
@@ -177,25 +178,28 @@ else if a == none and c != none and b != none {
 }
 
 #let flex-2d(..sink, v-spacing: none, h-spacing: none) = {
-    let args = sink.pos()
-    let groups = partition(args, (x) => x == parbreak)
-    let h-attrs = if h-spacing != none {
-        (spacing: h-spacing)
-    } else {
-        (:)
-    }
-    let v-attrs = if v-spacing != none{
-        (spacing: v-spacing)
-    } else {
-        (:)
-    }
-    let rows = groups.map((elements) => {
-        return flex(..elements, ..h-attrs)
-    })
-    return flex(rows, ..v-attrs, dir: ttb)
+  let args = sink.pos()
+  let groups = partition(args, x => x == parbreak)
+  let h-attrs = if h-spacing != none {
+    (spacing: h-spacing)
+  } else {
+    (:)
+  }
+  let v-attrs = if v-spacing != none {
+    (spacing: v-spacing)
+  } else {
+    (:)
+  }
+  let rows = groups.map(elements => {
+    return flex(..elements, ..h-attrs)
+  })
+  return flex(rows, ..v-attrs, dir: ttb)
 }
 
-#let arrow-table(items, arrow-length: 10pt) = (
+#let arrow-table(
+  items,
+  arrow-length: 10pt,
+) = (
   // similar to answer-reference-table used in one of the worksheets
   context {
     let widthes = items.map(x => measure(x.first()).width)
@@ -207,5 +211,121 @@ else if a == none and c != none and b != none {
   }
 )
 
+#let flex2(
+  ..items,
+  spacing: none,
+  dir: ltr,
+  line: none,
+) = {
+
+  let horizontal = dir == ltr
+  if spacing == none or spacing == auto {
+    spacing = 1em
+  }
+
+  let base = filter-none(flat(items.pos()))
+  if base.len() <= 1 {
+    return base.join()
+  }
+
+  let columns = if horizontal {
+    base.len()
+  } else {
+    1
+  }
+  let cell-align = if horizontal {
+    horizon
+  } else {
+    center
+  }
+
+  grid(
+    ..base,
+    columns: columns,
+    gutter: spacing,
+    align: cell-align,
+  )
+}
+
+#let flex2(
+  ..items,
+  spacing: none,
+  dir: ltr,
+  line: none,
+  padding: 0.5em,
+) = {
+  let horizontal = dir == ltr
+  if spacing == none or spacing == auto {
+    spacing = 1em
+  }
+
+  let base = filter-none(gather(items.pos()))
+  if base.len() <= 1 {
+    return base.join()
+  }
+
+  let columns = if horizontal {
+    base.len()
+  } else {
+    1
+  }
+  let cell-align = if horizontal {
+    horizon
+  } else {
+    center
+  }
+  let show-line = line != none
+
+  // Insets to create padding around the separator
+  let inset-func = if show-line {
+    if horizontal {
+      // padding around a vertical separator between col 0 and col 1
+      (col, row) => {
+        if col == 0 {
+          (right: padding)
+        } else if col == 1 {
+          (left: padding)
+        } else {
+          (:)
+        }
+      }
+    } else {
+      // padding around a horizontal separator between row 0 and row 1
+      (col, row) => {
+        if row == 0 {
+          (bottom: padding)
+        } else if row == 1 {
+          (top: padding)
+        } else {
+          (:)
+        }
+      }
+    }
+  } else {
+    none
+  }
+
+  let citems = base
+  if show-line and horizontal {
+    citems.push(grid.vline(x: 1, stroke: line))
+  }
+  if show-line and not horizontal {
+    citems.push(grid.hline(y: 1, stroke: line))
+  }
+  grid(
+    columns: columns,
+    gutter: spacing,
+    align: cell-align,
+    inset: inset-func,
+    ..citems
+  )
+}
+
+
+
 #let vflex = flex.with(dir: ttb, centered: false)
 #let hflex = flex.with(dir: ltr, centered: false)
+
+
+#let vflex2 = flex2.with(dir: ttb)
+#let hflex2 = flex2.with(dir: ltr)

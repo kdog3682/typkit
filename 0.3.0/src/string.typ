@@ -104,8 +104,6 @@
 
 
 // Built-in upper() function - converts all text to uppercase
-#upper("hello world")  // "HELLO WORLD"
-
 // Custom capitalize function - capitalizes first letter only
 #let capitalize(text) = {
   let chars = text.clusters()

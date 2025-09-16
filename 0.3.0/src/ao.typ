@@ -142,3 +142,18 @@
   
   return result
 }
+
+
+#let gather(x) = {
+  if x == none {
+    return ()
+  }
+  if type(x) != array {
+    return (x,)
+  }
+  if x.len() == 1 and type(x.first()) == array {
+    x = x.first()
+  }
+  return x
+
+}

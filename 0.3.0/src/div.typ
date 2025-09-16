@@ -171,6 +171,9 @@
   if result == none {
     return none
   }
+  if bold  == true {
+   weight = "bold"
+  }
   let attrs = filter-none((
     font: font,
     fill: fg,
@@ -250,6 +253,9 @@
   inset: none,
   outset: none,
   clip: none,
+  paint: none,
+  thickness: none,
+  dash: none,
   width: none,
   height: none,
   wrapper: box,
@@ -258,6 +264,15 @@
     strokes.at(stroke)
   } else {
     stroke
+  }
+  if s == none {
+    let temp = (:)
+    if paint != none { temp.paint = paint}
+    if dash != none { temp.dash = dash}
+    if thickness != none { temp.thickness = thickness}
+    if temp.len() > 0 {
+     s = temp
+    }
   }
   if circle == true {
     let cattrs = filter-none((fill: bg, stroke: s, radius: radius))
@@ -349,11 +364,15 @@
   }
 }
 
-#let _apply-rule-and-newline(node, size: none, line: none, line-above: 20, line-below: 30, newline: none) = {
-  let out = node
+#let _apply-rule-and-newline(node, size: none, line: none, line-above: 10, line-below: 20, newline: none) = {
+  if line == none {
+    return node
+  }
+  node
+
   if exists(line) {
     if line == true {
-      v(-0.85 * resolve-point(size))
+      v(-1pt * line-above)
       _line(length: 100%)
       v(1pt * line-below)
     } else {
@@ -369,7 +388,6 @@
       v(resolve-point(newline))
     }
   }
-  out
 }
 
 #let _overlay-anchors(
@@ -472,6 +490,9 @@
 #let div(
   ..sink,
   // Box & visuals
+  paint: none,
+  thickness: none,
+  dash: none,
   width: none, height: none, bg: none, wh: none, stroke: none, radius: none, colors: none,
   wrapper: box, markup: false, inset: none, outset: none, clip: none,
   // Flow helpers
@@ -482,7 +503,7 @@
   text-mode: none, tracking: none, pad-left: none, margin-left: none, margin-bottom: none, margin-top: none, margin-right: none,
   spacing: none, baseline: none, overhang: false, dir: ltr,
   // Decorations
-  underline: none, line: none, line-above: 20, line-below: 30, strike: none, text-stroke: none,
+  underline: none, line: none, line-above: 10, line-below: 10, strike: none, text-stroke: none,
   // Alignment before box
   align: none, northwest: none, southeast: none, southwest: none, northeast: none, north: none, south: none, east: none, west: none,
   // Extras
@@ -581,6 +602,9 @@
     circle: circle == true,
     bg: bg,
     stroke: stroke,
+    paint: paint,
+    thickness: thickness,
+    dash: dash,
     radius: radius,
     inset: inset,
     outset: outset,
