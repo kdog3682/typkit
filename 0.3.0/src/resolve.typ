@@ -4,7 +4,11 @@
   if x == none {
     return none
   }
-  if type(x) == color {
+
+    if type(x) == array {
+      return gradient.linear(..x)
+    }
+  if type(x) == color or type(x) == gradient{
     return x
   }
   // #rgb

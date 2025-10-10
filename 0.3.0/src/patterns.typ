@@ -1,3 +1,4 @@
+#let pattern = tiling
 #let criss-cross = pattern(
   size: (3pt, 3pt),
   {

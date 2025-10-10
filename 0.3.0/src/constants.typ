@@ -31,6 +31,7 @@
     ok(13, 15, 21, 10), // blue
     ok(20, 15, 0, 10), // light-purple
     ok(20, 21, 1, 10), // darker purple
+    black,
 )
 
 
@@ -117,3 +118,12 @@
   "kid-board-7in": (7in, 7in),
 )
 
+
+#let sizes = (
+  h1: 24pt,
+  h2: 18pt,
+  h3: 24pt,
+  h4: 24pt,
+  h5: 24pt,
+  h6: 42pt,
+)

@@ -4,6 +4,7 @@
 #import "base.typ": *
 #import "layout.typ": *
 #import "is.typ": *
+#import "star.typ": *
 // #import "grid.typ": *
 #import "components.typ": *
 #import "staging.typ": *
@@ -12,12 +13,16 @@
 #import "strokes.typ"
 #import "font.typ"
 #import "colors.typ"
+#import "tiling.typ"
 #import "string.typ": *
+#import "string.typ"
+#import "my.typ"
 #import "typst.typ"
 // #import "templates.typ"
 #import "constants.typ"
 
 #import "resolve.typ": *
+#import "new.typ": *
 // #import "colors.typ": color-pair
 
 #let markup(s) = {
@@ -199,7 +204,7 @@
   }
 }
 
-#let rec(..sink) = {
+#let rec(..sink, k: 10) = {
   let args = sink.pos()
   let length = args.len()
   let (width, height, color) = if length == 3 {
@@ -209,8 +214,8 @@
   } else {
     (args.first(), args.first(), blue)
   }
-  let width = resolve-point(width) * 10
-  let height = resolve-point(height) * 10
+  let width = resolve-point(width) * k
+  let height = resolve-point(height) * k
   box(rect(width: width, height: height, fill: color))
 }
 
@@ -247,10 +252,6 @@
   }
 }
 
-
-#let hr(stroke, above: 0, below: 0, length: 100%) = {
-  space-wrap(line(length: length), before: above, after: below, dir: v)
-}
 
 #let assert-existance(s) = {
   assert(s != none, message: "a value is required ... the value is none")
@@ -296,66 +297,4 @@
 }
 
 
-
-#let parse-rects(s) = {
-  let colors = constants.ROYGBIV9
-  let r = if "," in s {
-regex("(-?\\d+)\\s*,\\s*(-?\\d+)")
-  } else {
-  regex("(\\d(?:\.\d)?)(\\d(?:\.\d)?)")
-  }
-  let coords = s.matches(r).map(m => (float(m.captures.at(0)), float(m.captures.at(1))))
-  return coords.enumerate().map(((i, x)) => rec(..x, colors.at(i)))
-}
-
-
-#let flex-wrap(items, spacing: 5pt, width: 150pt) = {
-  block(items.join(h(spacing)), width: width)
-}
-
-#let opposite(x) = {
-    if x == ltr {
-      return ttb
-    }
-    if x == ttb {
-      return ltr
-    }
-}
-
-#let indent(x, ind: 10pt) = {
-    pad(x, left: ind)
-}
-#let view(x) = {
-  scale(x, 45%, reflow: true)
-}
-
-
-
-
-
-#let insetf(inset) = {
-    
-let inset-func(col, row) = {
-  // spacing between the first and 2nd row
-  if row == 0 {
-    (bottom: inset)
-  } else if row == 1 {
-    (top: inset)
-  } else {
-    (:)
-  }
-}
-return inset-func
-}
-
-
-#let v-separator(a, b) = {
-  let header = grid(a, b, align: center, grid.hline(y: 1, stroke: 0.5pt), inset: insetf(10pt), )
-  header
-}
-
-
-#let copyright(s) = {
-    flex(sym.copyright, s, spacing: 2pt)
-}
 

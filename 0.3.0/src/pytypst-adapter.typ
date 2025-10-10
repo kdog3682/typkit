@@ -12,7 +12,9 @@
   paint: black,
   fill: none,
   thickness: 0.5pt,
+  bold: false,
   dash: "densely-dotted",
+  stroke: none,
   centered: true,
 ) = {
   let stroke = (:)
@@ -50,6 +52,9 @@
 
   if centered == true {
     body = align(body, center + horizon)
+  }
+  if bold == true {
+   body = strong(body)
   }
   _box(body, ..spec)
 }

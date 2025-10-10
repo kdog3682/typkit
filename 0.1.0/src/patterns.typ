@@ -1,4 +1,5 @@
 
+#let pattern = tiling
 #let criss-cross = pattern(size: (3pt, 3pt), {
     place(line(start: (0%, 0%), end: (100%, 100%)))
     place(line(start: (0%, 100%), end: (100%, 0%)))

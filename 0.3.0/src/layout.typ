@@ -1,5 +1,13 @@
-#import "ao.typ": merge-attrs, filter-none, to-array, mapfilter, partition
+#import "ao.typ": merge-attrs, filter-none, to-array, mapfilter, partition, gather
 #import "is.typ": is-number, is-length
+// #import "constants.typ": alphabet
+
+
+#let n2char(n) = {
+  let ALPHABET = "abcdefghijklmnopqrstuvwxyz"
+  return ALPHABET.at(n)
+}
+
 #let flex(
   spacing: none,
   dir: ltr,
@@ -211,48 +219,20 @@
   }
 )
 
-#let flex2(
-  ..items,
-  spacing: none,
-  dir: ltr,
-  line: none,
-) = {
 
-  let horizontal = dir == ltr
-  if spacing == none or spacing == auto {
-    spacing = 1em
-  }
 
-  let base = filter-none(flat(items.pos()))
-  if base.len() <= 1 {
-    return base.join()
-  }
 
-  let columns = if horizontal {
-    base.len()
-  } else {
-    1
-  }
-  let cell-align = if horizontal {
-    horizon
-  } else {
-    center
-  }
 
-  grid(
-    ..base,
-    columns: columns,
-    gutter: spacing,
-    align: cell-align,
-  )
-}
+#let vflex = flex.with(dir: ttb, centered: false)
+#let hflex = flex.with(dir: ltr, centered: false)
+
 
 #let flex2(
   ..items,
   spacing: none,
   dir: ltr,
-  line: none,
-  padding: 0.5em,
+  separator: none,
+  modifications: none,
 ) = {
   let horizontal = dir == ltr
   if spacing == none or spacing == auto {
@@ -274,58 +254,69 @@
   } else {
     center
   }
-  let show-line = line != none
 
-  // Insets to create padding around the separator
-  let inset-func = if show-line {
-    if horizontal {
-      // padding around a vertical separator between col 0 and col 1
-      (col, row) => {
+  if separator != none {
+    if separator == true {
+      separator = 0.5pt + black
+    }
+    if horizontal == true {
+      base.push(grid.vline(x: 1, stroke: separator))
+    } else {
+      base.push(grid.hline(y: 1, stroke: separator))
+    }
+  }
+
+  // build props dict for grid
+  let props = (columns: columns, align: cell-align)
+  if separator != none {
+    let inset-func = (col, row) => {
+      if horizontal {
         if col == 0 {
-          (right: padding)
+          (right: spacing)
         } else if col == 1 {
-          (left: padding)
+          (left: spacing)
         } else {
           (:)
         }
-      }
-    } else {
-      // padding around a horizontal separator between row 0 and row 1
-      (col, row) => {
+      } else {
         if row == 0 {
-          (bottom: padding)
+          (:)
+          // (bottom: spacing)
         } else if row == 1 {
-          (top: padding)
+          (top: spacing)
         } else {
           (:)
         }
       }
     }
+    props.inset = inset-func
+    if dir == ttb {
+      props.gutter = spacing
+    }
   } else {
-    none
+    props.gutter = spacing
   }
 
-  let citems = base
-  if show-line and horizontal {
-    citems.push(grid.vline(x: 1, stroke: line))
+  if modifications != none {
+    let modify((i, el)) = {
+      let k = modifications.at(n2char(i), default: none)
+      if k == none {
+        return el
+      }
+      return grid.cell(el, ..k)
+    }
+    base = base.enumerate().map(modify)
   }
-  if show-line and not horizontal {
-    citems.push(grid.hline(y: 1, stroke: line))
-  }
-  grid(
-    columns: columns,
-    gutter: spacing,
-    align: cell-align,
-    inset: inset-func,
-    ..citems
-  )
+  grid(..props, ..base)
 }
 
+#let arrow-flex() = {
+    
+arro
+arrow(10pt, angle: -90deg)
+}
 
-
-#let vflex = flex.with(dir: ttb, centered: false)
-#let hflex = flex.with(dir: ltr, centered: false)
-
-
-#let vflex2 = flex2.with(dir: ttb)
 #let hflex2 = flex2.with(dir: ltr)
+#let vflex2 = flex2.with(dir: ttb)
+
+#let stack = vflex2

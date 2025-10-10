@@ -73,7 +73,11 @@
 }
 #let map(items, fn) = {
   let store = ()
-  let items = maybe-dict-to-array(items)
+  let items = if type(items) == int {
+    range(1, items + 1)
+  } else {
+maybe-dict-to-array(items)
+  }
   let as-object = type(items.first()) == dictionary
   let as-array = type(items.first()) == array
   for item in items {
@@ -156,4 +160,10 @@
   }
   return x
 
+}
+#let push(store, body) = {
+      if body != none {
+        store.push(body)
+      }
+      return store
 }

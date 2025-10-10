@@ -3,9 +3,9 @@
 #import "layout.typ": flex
 #import "string.typ": strfmt
 #import "base.typ": tern, exists, to-content, mirror
-#import "resolve.typ": resolve-point
-#import "./strokes.typ"
-#import "./patterns.typ"
+#import "resolve.typ": resolve-point, resolve-fill
+#import "strokes.typ"
+#import "patterns.typ"
 #let strokes = dictionary(strokes)
 #let patterns = dictionary(patterns)
 
@@ -176,7 +176,7 @@
   }
   let attrs = filter-none((
     font: font,
-    fill: fg,
+    fill: resolve-fill(fg),
     size: resolve-point(size),
     style: style,
     weight: weight,
@@ -492,6 +492,7 @@
   // Box & visuals
   paint: none,
   thickness: none,
+  pill: false,
   dash: none,
   width: none, height: none, bg: none, wh: none, stroke: none, radius: none, colors: none,
   wrapper: box, markup: false, inset: none, outset: none, clip: none,
@@ -510,6 +511,20 @@
   value: none, flex: none, class: none, template: none, no-none: false, chinese: false,
 ) = {
   // 1) Gather positional content (with overlays)
+  if pill == true {
+    if inset == none {
+     inset = 8pt
+    }
+    if radius == none {
+     radius = 3pt
+    }
+    if stroke == none {
+     stroke = strokes.thin
+  }
+    if bg == none {
+ bg = gray.lighten(85%)
+  }
+  }
   let args = sink.pos()
 
   if chinese == true {
@@ -735,3 +750,4 @@
   flex(vertical, dir: ttb, spacing: arrow-spacing)
 }
 
+#let pill = div.with(radius: 3pt, stroke: strokes.thin, inset: 5pt, centered: true, bold: true)

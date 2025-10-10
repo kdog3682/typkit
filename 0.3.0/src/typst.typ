@@ -33,9 +33,9 @@
 #let gray = gray
 #let rotate = rotate
 #let columns = columns
-#let path = path
-// #let curve = curve
-// #let tiling = tiling
+#let path = curve
+#let curve = curve
+#let tiling = tiling
 
 
 // #table(align: 1, column-gutter: 1, columns: 1, fill: 1, gutter: 1, inset: 1, row-gutter: 1, rows: 1, stroke: 1)

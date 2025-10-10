@@ -5,11 +5,11 @@
   let result = ""
   let arg_index = 0
   let i = 0
-  
+
   while i < s.len() {
     if i < s.len() - 1 and s.at(i) == "%" {
       let next_char = s.at(i + 1)
-      
+
       if next_char == "%" {
         // Escaped %
         result += "%"
@@ -38,16 +38,16 @@
 
 
 #let templater(s, ref) = {
-    let replacement(s) = {
-        let key = s.captures.first()
-        return str(ref.at(key))
-    }
-    let pattern = "\$(\w+)"
-    return s.replace(regex(pattern), replacement)
+  let replacement(s) = {
+    let key = s.captures.first()
+    return str(ref.at(key))
+  }
+  let pattern = "\$(\w+)"
+  return s.replace(regex(pattern), replacement)
 }
 
 #let replace(s, pattern, replacement) = {
-    return s.replace(regex(pattern), replacement)
+  return s.replace(regex(pattern), replacement)
 }
 
 #let oxford(items) = {
@@ -64,14 +64,14 @@
 }
 
 #let split(s, pattern: "\s+") = {
-   let a = str(s).split(regex(pattern))
-   if a.at(0) == "" {
-       a.remove(0)
-   }
-   if a.at(-1) == "" {
-       a.remove(-1)
-   }
-   return a
+  let a = str(s).split(regex(pattern))
+  if a.at(0) == "" {
+    a.remove(0)
+  }
+  if a.at(-1) == "" {
+    a.remove(-1)
+  }
+  return a
 }
 
 
@@ -84,22 +84,22 @@
 }
 
 #let match(s, r) = {
-    let m = s.match(regex(r))
-    if m != none {
-        let len = m.captures.len()
-        if len > 1 {
-            m.captures
-        } else if len == 1 {
-            m.captures.at(0)
-        } else {
-            m.text
-        }
+  let m = s.match(regex(r))
+  if m != none {
+    let len = m.captures.len()
+    if len > 1 {
+      m.captures
+    } else if len == 1 {
+      m.captures.at(0)
+    } else {
+      m.text
     }
+  }
 }
 
 #let get-integers(s) = {
-    let m = s.matches(regex("\d+"))
-    return m.map((x) => int(x.text))
+  let m = s.matches(regex("\d+"))
+  return m.map(x => int(x.text))
 }
 
 
@@ -116,14 +116,42 @@
 
 // Title case function - capitalizes first letter of each word
 #let title-case(text) = {
-  text.split(" ").map(word => {
-    if word.len() > 0 {
-      upper(word.first()) + word.slice(1)
-    } else {
-      word
-    }
-  }).join(" ")
+  text
+    .split(" ")
+    .map(word => {
+      if word.len() > 0 {
+        upper(word.first()) + word.slice(1)
+      } else {
+        word
+      }
+    })
+    .join(" ")
 }
 
+#let get-text(s) = {
+  if type(s) == str {
+    return s
+  }
+  if type(s) == content {
+    let fields = s.fields()
+    let body = fields.at("body", default: none)
 
+    while body != none {
+      body = fields.at("body", default: none)
+      if body == none {
+        break
+      }
+      fields = body.fields()
+    }
+    let text = fields.at("text", default: none)
+    return text
+  }
+  panic(type(s))
+}
+#let listify(s) = {
+  let text = get-text(s)
+  return text.split("").slice(1, -1)
+}
+
+// #panic(listify(heading(heading([hi]))))
 // #panic(strfmt("%s.%s", 66))
