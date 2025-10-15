@@ -193,3 +193,4 @@
 
 
 
+#let frame = div.with(wh: 200, stroke: black, inset: 10pt)

@@ -17,20 +17,27 @@
   stroke: none,
   centered: true,
 ) = {
-  let stroke = (:)
-  if paint != none {
-    stroke.paint = paint
-  }
-  if thickness != none {
-    stroke.thickness = thickness
-  }
-  if dash != none {
-    stroke.dash = dash
+  let spec = (:)
+  let _stroke = (:)
+  if stroke == none {
+    if paint != none {
+      _stroke.paint = paint
+    }
+    if thickness != none {
+      _stroke.thickness = thickness
+    }
+    if dash != none {
+      _stroke.dash = dash
+    } else {
+      _stroke = (:)
+    }
+    if _stroke.len() > 0 {
+      spec.stroke = _stroke
+    }
   } else {
-     stroke = (:)
+    spec.stroke = stroke
   }
 
-  let spec = (:)
   if fill != none {
     spec.fill = fill
   }
@@ -46,15 +53,12 @@
   if height != none {
     spec.height = height
   }
-  if stroke.len() > 0 {
-    spec.stroke = stroke
-  }
 
   if centered == true {
     body = align(body, center + horizon)
   }
   if bold == true {
-   body = strong(body)
+    body = strong(body)
   }
   _box(body, ..spec)
 }
@@ -82,7 +86,7 @@
 }
 
 #let text(body, font: none, fill: none, size: none, bold: none, italic: none) = {
-  if type(body) == str and body.starts-with("$") {
+  if type(body) == str and body.starts-with("$") and body.ends-with("$") {
     return math-text(body.slice(1, -1), font: font, fill: fill, size: size, bold: bold)
   }
   let spec = (:)
