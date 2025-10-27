@@ -7,111 +7,157 @@
   }
 }
 
-// Criss-cross tiling pattern
-#let criss-cross(
-  size: 10pt,
-  stroke: 1pt + black,
-) = {
-  let size = normalize-size(size)
-  tiling(
-    size: size,
-    {
-      place(line(start: (0%, 0%), end: (100%, 100%), stroke: stroke))
-      place(line(start: (0%, 100%), end: (100%, 0%), stroke: stroke))
-    },
-  )
-}
-
-// Checkerboard tiling pattern
 #let checkerboard(
-  size: 10pt,
+  size: 20pt,
   fg: black,
   bg: white,
 ) = {
-  let size = normalize-size(size)
-  tiling(
-    size: size,
+  let (w, h) = normalize-size(size)
+  let r = rect.with(width: w / 2, height: h / 2)
+  return pattern(
+    size: (w, h),
     {
-      place(rect(width: 50%, height: 50%, fill: bg))
-      place(dx: 50%, rect(width: 50%, height: 50%, fill: fg))
-      place(dy: 50%, rect(width: 50%, height: 50%, fill: fg))
-      place(dx: 50%, dy: 50%, rect(width: 50%, height: 50%, fill: bg))
+      block(
+        {
+          place(r(fill: fg), top + left)
+          place(r(fill: bg), top + right)
+          place(r(fill: bg), bottom + left)
+          place(r(fill: fg), bottom + right)
+        },
+        width: w,
+        height: h,
+      )
     },
   )
 }
 
-// Diagonal stripes pattern
-#let diagonal-stripes(
-  size: 10pt,
-  stroke: 2pt + black,
+#let stripes(
+  mode: "horizontal",
+  thickness: 0.25pt,
+  paint: black,
+  spacing: 5pt,
+  bg: none,
 ) = {
-  let size = normalize-size(size)
-  tiling(
-    size: size,
+  let (w, h) = normalize-size(spacing)
+  let l = line.with(stroke: (thickness: thickness, paint: paint))
+  return pattern(
+    size: (w, h),
     {
-      place(line(start: (0%, 0%), end: (100%, 100%), stroke: stroke))
+      block(
+        {
+          if bg != none {
+            place(rect(width: w, height: h, fill: bg, stroke: none))
+          }
+          if mode == "horizontal" {
+            place(l(start: (0%, 100%), end: (100%, 100%)))
+          } else if mode == "vertical" {
+            place(l(start: (0%, 0%), end: (0%, 100%)))
+          } else if mode == "diagonal" {
+            place(l(start: (0%, 0%), end: (100%, 100%)))
+          } else if mode == "anti-diagonal" {
+            place(l(start: (0%, 100%), end: (100%, 0%)))
+          } else if mode == "criss-cross" {
+            place(l(start: (0%, 0%), end: (100%, 100%)))
+            place(l(start: (0%, 100%), end: (100%, 0%)))
+          }
+        },
+        width: w,
+        height: h,
+      )
     },
   )
 }
 
-// Grid pattern
-#let grid-pattern(
-  size: 10pt,
-  stroke: 1pt + black,
-) = {
-  let size = normalize-size(size)
-  tiling(
-    size: size,
-    {
-      place(line(start: (0%, 0%), end: (100%, 0%), stroke: stroke))
-      place(line(start: (0%, 0%), end: (0%, 100%), stroke: stroke))
-    },
-  )
-}
-
-// Dots pattern
-#let dots(
-  size: 10pt,
-  radius: 3pt,
-  fill: black,
-) = {
-  let size = normalize-size(size)
-  tiling(
-    size: size,
-    {
-      place(dx: 50%, dy: 50%, circle(radius: radius, fill: fill))
-    },
-  )
-}
-
-// Horizontal stripes pattern
-#let horizontal-stripes(
-  size: 10pt,
+#let polka-dots(
+  radius: 1pt,
+  spacing: 8pt,
   fg: black,
-  bg: white,
+  bg: none,
 ) = {
-  let size = normalize-size(size)
-  tiling(
-    size: size,
+  let (w, h) = normalize-size(spacing)
+  return pattern(
+    size: (w, h),
     {
-      place(rect(width: 100%, height: 50%, fill: bg))
-      place(dy: 50%, rect(width: 100%, height: 50%, fill: fg))
+      block(
+        {
+          if bg != none {
+            place(rect(width: w, height: h, fill: bg, stroke: none))
+          }
+          place(
+            circle(radius: radius, fill: fg, stroke: none),
+            center + horizon,
+          )
+        },
+        width: w,
+        height: h,
+      )
     },
   )
 }
 
-// Vertical stripes pattern
-#let vertical-stripes(
-  size: 10pt,
+// Pattern presets
+#let cross-hatch = stripes.with(
+  mode: "criss-cross",
+  thickness: 0.25pt,
+  paint: black,
+  spacing: 5pt,
+)
+
+#let horizontal-lines = stripes.with(
+  mode: "horizontal",
+  thickness: 0.25pt,
+  paint: black,
+  spacing: 5pt,
+)
+
+#let vertical-lines = stripes.with(
+  mode: "vertical",
+  thickness: 0.25pt,
+  paint: black,
+  spacing: 5pt,
+)
+
+#let diagonal-lines = stripes.with(
+  mode: "diagonal",
+  thickness: 0.25pt,
+  paint: black,
+  spacing: 5pt,
+)
+
+#let anti-diagonal-lines = stripes.with(
+  mode: "anti-diagonal",
+  thickness: 0.25pt,
+  paint: black,
+  spacing: 5pt,
+)
+
+#let dots = polka-dots.with(
+  radius: 1pt,
+  spacing: 8pt,
   fg: black,
-  bg: white,
-) = {
-  let size = normalize-size(size)
-  tiling(
-    size: size,
-    {
-      place(rect(width: 50%, height: 100%, fill: bg))
-      place(dx: 50%, rect(width: 50%, height: 100%, fill: fg))
-    },
-  )
-}
+)
+
+// Examples
+
+// #let sample-rect = rect.with(
+//   width: 50pt,
+//   height: 50pt,
+//   stroke: black,
+// )
+
+// #let fills = (
+//   checkerboard(),
+//   horizontal-lines(),
+//   vertical-lines(),
+//   diagonal-lines(),
+//   anti-diagonal-lines(),
+//   cross-hatch(),
+//   dots(),
+//   checkerboard(fg: red, bg: yellow),
+// )
+//
+// #grid(
+//   columns: 4,
+//   gutter: 15pt,
+//   ..fills.map(fill => sample-rect(fill: fill))
+// )
