@@ -66,6 +66,8 @@
 
 
 #let math-text(body, font: none, fill: none, size: none, bold: none) = {
+  let content = $#body$
+  return content
   let spec = (:)
   if fill != none {
     spec.fill = fill
@@ -77,7 +79,7 @@
     spec.font = font
   }
 
-  let content = math.equation(body)
+  let content = $#body$
   if bold != none {
     content = math.bold(content)
   }
@@ -85,7 +87,16 @@
   return _text(..spec, content)
 }
 
-#let text(body, font: none, fill: none, size: none, bold: none, italic: none) = {
+#let text(body, weight: none, font: none, fill: none, size: none, bold: none, italic: none, hidden: false, fill-color: none) = {
+  if fill-color != none {
+     fill = fill-color
+  }
+  if weight != none {
+     bold = true
+  }
+  if hidden == true {
+    return
+  }
   if type(body) == str and body.starts-with("$") and body.ends-with("$") {
     return math-text(body.slice(1, -1), font: font, fill: fill, size: size, bold: bold)
   }
@@ -101,7 +112,7 @@
   }
 
   if bold != none {
-    spec.weight = if bold {
+    spec.weight = if bold == true {
       "bold"
     } else {
       "regular"

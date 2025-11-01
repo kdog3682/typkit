@@ -513,7 +513,7 @@
   // 1) Gather positional content (with overlays)
   if pill == true {
     if inset == none {
-     inset = 8pt
+     inset = 5pt
     }
     if radius == none {
      radius = 3pt

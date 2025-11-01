@@ -1,10 +1,26 @@
 #import "constants.typ"
 #import "strokes.typ"
+#import "resolve.typ": resolve-point
 #import "layout.typ": flex
 #import "div.typ": div
 
 #let parse-rects(s, k: 10) = {
+
   let colors = constants.ROYGBIV9
+  let rec(..sink, k: 10) = {
+    let args = sink.pos()
+    let length = args.len()
+    let (width, height, color) = if length == 3 {
+      args
+    } else if length == 2 {
+      args + (blue,)
+    } else {
+      (args.first(), args.first(), blue)
+    }
+    let width = resolve-point(width) * k
+    let height = resolve-point(height) * k
+    box(rect(width: width, height: height, fill: color))
+  }
   let r = if "," in s {
     regex("(-?\\d+)\\s*,\\s*(-?\\d+)")
   } // else if "[" in s {
@@ -194,3 +210,9 @@
 
 
 #let frame = div.with(wh: 200, stroke: black, inset: 10pt)
+
+
+#let emphasize(content, bold: true, centered: true, spacing: 5pt) = {
+    let c = if bold == true {strong(content)} else {content}
+    space-sandwich(c, centered: centered, spacing: spacing)
+}

@@ -40,6 +40,7 @@
     dashed: "dashed",
     dash-dotted: "dash-dotted",
     dd: "densely-dotted",
+    dash: "densely-dotted",
     ddd: "densely-dash-dotted",
     loosely-dotted: "loosely-dotted",
     loosely-dashed: "loosely-dashed",
@@ -204,20 +205,6 @@
   }
 }
 
-#let rec(..sink, k: 10) = {
-  let args = sink.pos()
-  let length = args.len()
-  let (width, height, color) = if length == 3 {
-    args
-  } else if length == 2 {
-    args + (blue,)
-  } else {
-    (args.first(), args.first(), blue)
-  }
-  let width = resolve-point(width) * k
-  let height = resolve-point(height) * k
-  box(rect(width: width, height: height, fill: color))
-}
 
 
 #let square(..sink) = {
