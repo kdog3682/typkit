@@ -38,6 +38,9 @@
 
 
 #let templater(s, ref) = {
+  if type(ref) == array {
+    ref = (ref,)
+  }
   let replacement(s) = {
     let key = s.captures.first()
     return str(ref.at(key))

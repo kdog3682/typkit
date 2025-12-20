@@ -33,6 +33,11 @@
   }
 }
 
+#let point-to-float(point) = {
+  return float(repr(point).replace("pt", ""))
+}
+
+
 #let stroked(..args) = {
   let dash-patterns = (
     solid: "solid",
@@ -106,13 +111,23 @@
 }
 
 
-#let o-table(objects) = {
+#let show-as-content(x) = {
+    if type(x) == content {
+      return x
+    }
+    if type(x) == str {
+      return x
+    }
+    return repr(x)
+}
+#let o-table(objects, columns: none, align: center + horizon, inset: 5pt) = {
   let keys = objects.first().keys()
-  let store = objects.map(x => x.values()).flatten()
+  let store = objects.map(x => x.values().map(show-as-content)).flatten()
   show table.cell.where(y: 0): strong
   table(
-    columns: (60pt,) * keys.len(),
-    align: center + horizon,
+    columns: if columns != none {columns} else {(60pt,) * keys.len()},
+    align: align,
+    inset: inset,
     table.header(..keys),
     ..store
   )
@@ -284,4 +299,12 @@
 }
 
 
+
+
+
+#let measured(input) = context {
+    let content = show-as-content(input)
+    let m = measure(content)
+    table(content, repr(m), columns: 2, inset: 10pt)
+}
 

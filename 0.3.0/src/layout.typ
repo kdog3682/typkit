@@ -233,6 +233,7 @@
   dir: ltr,
   separator: none,
   modifications: none,
+  align: none,
 ) = {
   let horizontal = dir == ltr
   if spacing == none or spacing == auto {
@@ -312,7 +313,6 @@
 
 #let arrow-flex() = {
     
-arro
 arrow(10pt, angle: -90deg)
 }
 
@@ -320,3 +320,4 @@ arrow(10pt, angle: -90deg)
 #let vflex2 = flex2.with(dir: ttb)
 
 #let stack = vflex2
+#let flex = hflex2
