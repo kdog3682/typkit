@@ -6,13 +6,15 @@
 #import "is.typ": *
 #import "star.typ": *
 // #import "grid.typ": *
-#import "components.typ": *
+// #import "components.typ": *
+#import "components/index.typ" as components
 #import "staging.typ": *
 #import "pytypst-adapter.typ": *
 #import "patterns.typ"
 #import "strokes.typ"
 #import "font.typ"
 #import "colors.typ"
+#import "debug.typ"
 #import "tiling.typ"
 #import "string.typ": *
 #import "string.typ"
@@ -167,6 +169,26 @@
     class: stylesheet.title.at(style),
   )
 }
+#let resolve-dot-dict(dict, key) = {
+  let parts = key.split(".")
+  let val = dict
+  let path = ()
+  for p in parts {
+    if type(val) != dictionary {
+      panic("Cannot access '" + p + "' on non-dictionary at '" + path.join(".") + "'")
+    }
+    if p not in val {
+      let loc = if path.len() == 0 { "root" } else { "'" + path.join(".") + "'" }
+      panic("Key '" + p + "' not found at " + loc)
+    }
+    val = val.at(p)
+    path.push(p)
+  }
+  val
+}
+#let styled(content, key) = {
+  div(content, class: resolve-dot-dict(stylesheet, key))
+}
 #let qnum(s, style: "default") = {
   div(
     s,
@@ -307,4 +329,3 @@
     let m = measure(content)
     table(content, repr(m), columns: 2, inset: 10pt)
 }
-

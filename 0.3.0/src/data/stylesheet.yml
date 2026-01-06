@@ -24,6 +24,17 @@ qnum:
         inset: 1.5
         # this is about the size of the small pill
         align: center + horizon
+
+    e1:
+        radius: 2.5
+        fg: black
+        bg: gray_a
+        bold: true
+        stroke: 0.5pt
+        size: 0.85em
+        wh: 20
+        inset: 1.5
+        align: center + horizon
 level:
     default:
         radius: 1.5

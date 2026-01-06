@@ -92,7 +92,7 @@
     sym.tilde,
   ).join(h(5pt))
 }
-#let h1(..pieces, size: "h1", underline: false, centered: false) = {
+#let resolve-font-size(size) = {
   let heading-sizes = (
     "h1": 24pt,
     "h2": 18pt,
@@ -101,27 +101,12 @@
     "h5": 10pt,
     "h6": 8pt,
   )
-
-
-  let contents = pieces.pos()
-  let s = contents.map(text).join(h(2pt))
-  let size = if type(size) == str {
-    heading-sizes.at(size)
+  if type(size) == str {
+    heading-sizes.at(size, default: 12pt)
   } else {
     size
   }
-  set text(size: size, weight: "bold")
-
-  if centered == true {
-    s = align(s, center)
-  }
-  s
-  if underline == true {
-    v(-0.8em)
-    line(length: 100%, stroke: strokes.thin)
-  }
 }
-
 
 #let collect(doc) = {
   let store = ()
@@ -216,3 +201,33 @@
     let c = if bold == true {strong(content)} else {content}
     space-sandwich(c, centered: centered, spacing: spacing)
 }
+// #heading("hi", text([--], size: 10pt), text("foo", size: 26pt), rule:(length: 70%), centered: false)
+
+
+// #heading("hi", text([--], size: 10pt), text("foo", size: 26pt), rule:(length: 70%), centered: false)
+
+
+
+#let heading(..pieces, size: "h1", rule: none, centered: false) = {
+  let contents = pieces.pos()
+  let s = flex(contents.map(text), spacing: 7pt)
+  let resolved-size = resolve-font-size(size)
+
+  set text(size: resolved-size, weight: "bold")
+  let alignment = if centered == true {center} else {left}
+  set align(alignment)
+  // set block(below: 0pt)
+  s
+  if rule != none {
+    if rule == auto or rule == true {
+      rule = (:)
+    }
+    let length = rule.at("length", default: 100%)
+    let stroke = rule.at("stroke", default: tk.strokes.thin)
+    // let offset = rule.at("offset", default: 8pt)
+    let offset = rule.at("offset", default: -0.8em)
+    v(offset)
+    line(length: length, stroke: stroke)
+  }
+}
+
