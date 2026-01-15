@@ -1,4 +1,3 @@
-
 /// Creates a math problemset with numbered questions
 /// - start: Starting question number (default: 1)
 /// - layout: "list" or "grid" (default: "list")
